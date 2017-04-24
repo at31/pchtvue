@@ -1,5 +1,7 @@
 <template>
-      <el-col :span="16">           
+      <el-col :span="16">
+      <!-- открфтие фильтра для фильтрации отделение, в фильтре сделать кнопку "выбрать все" "выбрать - добавление отлелений в список" -->
+       <el-button @click="showMapFilter" >Выбрать отделение по условию</el-button>           
         <div id="mapy" style="height: 800px"></div>
         
 <el-dialog title="Фильтр" v-model="fdVisible" size="tiny">
@@ -31,6 +33,19 @@
             <el-button @click="showPODetail = false">Закрыть</el-button>            
           </span>
         </el-dialog>
+        
+<el-dialog title="Tips" v-model="dialogMapFilterVisible" size="tiny">
+    <span></span>
+    <el-input v-model="postalCodeVal" placeholder="INDX"></el-input>
+    <el-switch on-text="" off-text v-model="postalCodeOpt"></el-switch>
+    <el-input v-model="evntsVal" placeholder="События Заголовок"></el-input>
+    <el-switch on-text="" off-text v-model="evntsOpt"></el-switch>
+
+    <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogMapFilterVisible = false">Cancel</el-button>
+    <!--el-button type="primary" @click="doFilter">Confirm</el-button-->
+  </span>
+</el-dialog>
     </el-col>   
 </template>
 
@@ -51,21 +66,26 @@
                 postalCodeOpt: false,
                 evntsVal: "",
                 evntsOpt: false,
-                fdVisible:false,
-                _route:[]
+                fdVisible: false,
+                //
+                dialogMapFilterVisible:false,
+                _route: []
             }
 
         },
         mounted() {
             console.log('mmap mounted');
             self = this;
-            if(this.mapready){
+            if (this.mapready) {
                 console.log("maready in mounted");
                 mapRender();
             }
 
         },
-        methods: {            
+        methods: {
+            showMapFilter:function(){
+                this.dialogMapFilterVisible=true;
+            },
             openPODetail: function(selPO) {
                 //console.log(selPO);
                 //this.$store.dispatch('testAction')
@@ -97,7 +117,7 @@
                     }
                 });
                 this.mymap.geoObjects.add(this.geoCollection);
-                this.fdVisible=false;
+                this.fdVisible = false;
             }
         },
         computed: {
@@ -119,10 +139,10 @@
             }
         },
         watch: {
-            filterDialogOpen:function(){
-                if(!this.fdVisible){
-                    this.fdVisible=true;   
-                }                
+            filterDialogOpen: function() {
+                if (!this.fdVisible) {
+                    this.fdVisible = true;
+                }
             },
             postalCodeVal: function(n, o) {
                 console.log('n ->' + n + ' o->' + o);
@@ -193,20 +213,20 @@
                 this.mymap.geoObjects.add(this.geoCollection);
             },
             makePath: function() {
-                let self=this;
+                let self = this;
                 this.geoCollection.removeAll();
                 if (this._route)
                     this.mymap.geoObjects.remove(this._route);
 
-                var pathArr = this.$store. state.selectedPO.map(function(otd) {
+                var pathArr = this.$store.state.selectedPO.map(function(otd) {
                     return {
                         type: 'wayPoint',
                         point: [otd.latitude, otd.longitude]
                     };
-                });                
+                });
                 window.ymaps.route(pathArr).then(
                     function(route) {
-                        console.log("zzz");         
+                        console.log("zzz");
                         self.mymap.geoObjects.add(route);
                         self._route = route;
                         self.mymap.geoObjects.add(route);

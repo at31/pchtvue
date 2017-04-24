@@ -11,8 +11,10 @@
   ref="evntstree">
 </el-tree>
 </el-tree>
-<el-button @click="makePath" v-show="createPathBtn">Создать маршрут</el-button>
-<h1 v-show="cpb">{{cpb}}</h1>
+<el-button @click="makePath" v-show="cpb">Создать маршрут</el-button>
+<!-- создать собывтие или пачку событий по нажатию кнопки содаются события для отмеченных из списка отделений через чекбокс, событие добавляется из модалотьного окна -->
+<el-button @click="makePath" v-show="cpb">Создать событие</el-button>
+<h1 v-show="cpb">true</h1>
 <el-dialog title="Подробная информация" v-model="showEvntDetail" size="tiny">
             <span>Мероприятие -  {{sEvnt.title}}</span>
             
@@ -51,7 +53,8 @@
      mounted() {
             console.log(this.cpb);
      },    
-    props:{createPathBtn:Boolean},
+    //props:{createPathBtn:Boolean},
+    props:["createPathBtn"],    
     computed:{
         selectedPO:function(){
             return this.$store.state.selectedPO;
