@@ -8,12 +8,13 @@
   default-expand-all
   :expand-on-click-node="false"
   :render-content="renderContent"
+  @check-change="checkEvntHolder"
   ref="evntstree">
 </el-tree>
 </el-tree>
 <el-button @click="makePath" v-show="cpb">Создать маршрут</el-button>
 <!-- создать собывтие или пачку событий по нажатию кнопки содаются события для отмеченных из списка отделений через чекбокс, событие добавляется из модалотьного окна -->
-<el-button @click="makePath" v-show="cpb">Создать событие</el-button>
+<el-button @click="createNewEvnt" v-show="cpb">Создать событие</el-button>
 <h1 v-show="cpb">true</h1>
 <el-dialog title="Подробная информация" v-model="showEvntDetail" size="tiny">
             <span>Мероприятие -  {{sEvnt.title}}</span>
@@ -61,6 +62,13 @@
         }
     },    
     methods: {
+    createNewEvnt:function(){
+            //to do
+        },
+     checkEvntHolder:function(){
+            console.log(this.$refs.evntstree.getCheckedNodes());
+            console.log(this.$refs.evntstree.getCheckedKeys());
+        },    
       makePath:function(){
           this.$store.dispatch('makePath');
           //console.log(JSON.stringify(this.$store.state.route));
