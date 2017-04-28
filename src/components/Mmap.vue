@@ -110,7 +110,7 @@
                         let res = _f[k](otd);
                         //console.log(`${otd.postalCode} - ${res}`);
                         if (res) {
-                            var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
+                             var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
                             self.geoCollection.add(pmark);
                         }
 

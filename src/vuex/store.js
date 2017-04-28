@@ -36,7 +36,7 @@ const actions = {
                 //alert(response.status) // 200
                 return response.json()
             }).then(function (data) {
-                //console.log(data);
+                console.log(data);
                 context.commit('ADD_TEST',data)
 
             });
@@ -55,7 +55,7 @@ const actions = {
                 //alert(response.status) // 200
                 return response.json()
             }).then(function (data) {
-                //console.log(data);
+                console.log(data);
                 context.commit('PO_LOADED',data);
                 context.commit('YMAPREADY', true);
 

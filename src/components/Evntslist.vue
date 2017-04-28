@@ -14,11 +14,10 @@
 </el-tree>
 <el-button @click="makePath" v-show="cpb">Создать маршрут</el-button>
 <!-- создать собывтие или пачку событий по нажатию кнопки содаются события для отмеченных из списка отделений через чекбокс, событие добавляется из модалотьного окна -->
-<el-button @click="createNewEvnt" v-show="cpb">Создать событие</el-button>
+<el-button @click="showNewEvnt=true" v-show="cpb">Создать событие</el-button>
 <h1 v-show="cpb">true</h1>
-<el-dialog title="Подробная информация" v-model="showEvntDetail" size="tiny">
-            <span>Мероприятие -  {{sEvnt.title}}</span>
-            
+ <el-dialog title="Подробная информация" v-model="showEvntDetail" size="tiny">
+     <span>Мероприятие -  {{sEvnt.title}}</span>
             <el-input v-model="sEvnt.postalCode" placeholder=""></el-input>
             <el-input v-model="sEvnt.start" placeholder=""></el-input>
             <el-input v-model="sEvnt.end" placeholder=""></el-input>
@@ -28,7 +27,24 @@
             <span slot="footer" class="dialog-footer">
             <el-button @click="showEvntDetail = false">Закрыть</el-button>            
           </span>
-        </el-dialog>
+ </el-dialog>
+
+
+<!-- new evnt modal-->
+<el-dialog title="Создание нового события" v-model="showNewEvnt" size="tiny">
+         <span>Заголовок</span>
+          <el-input v-model="sEvnt.title" placeholder=""></el-input>
+           <el-input v-model="sEvnt.postalCode" placeholder=""></el-input>
+            <el-input v-model="sEvnt.start" placeholder=""></el-input>
+            <el-input v-model="sEvnt.end" placeholder=""></el-input>
+            <el-input v-model="sEvnt.status" placeholder=""></el-input>
+            <el-input v-model="sEvnt.description" placeholder=""></el-input>            
+            <el-input v-model="sEvnt.executor" placeholder=""></el-input>                       
+            <span slot="footer" class="dialog-footer">
+            <el-button @click="showNewEvnt = false">Закрыть</el-button>
+            <el-button @click="saveNewEvnt">Сохранить</el-button>                        
+          </span>
+ </el-dialog>
 
 </el-col>     
 </template>
@@ -44,10 +60,12 @@
         cpb:this.createPathBtn,  
         data:[],
         sEvnt:{},
-        showEvntDetail:false,  
+        showEvntDetail:false,
+        showNewEvnt:false,  
         defaultProps: {
           children: 'evnts',
           label: 'label'
+            
         }
       }
     },
@@ -62,8 +80,18 @@
         }
     },    
     methods: {
-    createNewEvnt:function(){
-            //to do
+    saveNewEvnt:function(){
+        let evnt=
+            //to do view "new event" modal view + запись событий в базу из store
+        fetch('http://localhost:3000/po/all').then(function (response) {
+                //alert(response.headers.get('Content-Type')); // application/json; charset=utf-8
+                //alert(response.status) // 200
+                return response.json()
+            }).then(function (data) {
+                //console.log(data);
+                //context.commit('ADD_TEST',data)
+
+            });
         },
      checkEvntHolder:function(){
             console.log(this.$refs.evntstree.getCheckedNodes());
