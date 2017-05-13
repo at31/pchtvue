@@ -1,62 +1,16 @@
 <template>
-      <el-col :span="16">
-      <!-- открфтие фильтра для фильтрации отделение, в фильтре сделать кнопку "выбрать все" "выбрать - добавление отлелений в список" -->
-       <el-button @click="showMapFilter" >Выбрать отделение по условию</el-button>           
-        <div id="mapy" style="height: 800px"></div>
-        
-<el-dialog title="Фильтр" v-model="fdVisible" size="tiny">
-    <span>This is a message dialog visible {{fdVisible}}</span>
-    <el-input v-model="postalCodeVal" placeholder="INDX"></el-input>
-    <el-switch on-text="" off-text v-model="postalCodeOpt"></el-switch>
-    <el-input v-model="evntsVal" placeholder="События Заголовок"></el-input>
-    <el-switch on-text="" off-text v-model="evntsOpt"></el-switch>
-
-    <span slot="footer" class="dialog-footer">
-    <el-button @click="fdVisible = false">Отмена</el-button>
-    <el-button type="primary" @click="doFilter">Применить</el-button>
-  </span>
-</el-dialog>
-        
-        <el-dialog title="Подробная информация" v-model="showPODetail" size="tiny">
-            <span>Отделение -  {{selectedPO.postalCode}}</span>
-            
-            <el-input v-model="selectedPO.postalCode" placeholder=""></el-input>
-            <el-input v-model="selectedPO.region" placeholder=""></el-input>
-            <el-input v-model="selectedPO.settlement" placeholder=""></el-input>
-            <el-input v-model="selectedPO.typeCode" placeholder=""></el-input>
-            <el-input v-model="selectedPO.addressSource" placeholder=""></el-input>            
-            <div v-for="phone in selectedPO.phones">
-                <el-input v-model="phone.phoneNumber" placeholder=""></el-input>
-                <el-input v-model="phone.phoneTypeName" placeholder=""></el-input>
-            </div>            
-            <span slot="footer" class="dialog-footer">
-            <el-button @click="showPODetail = false">Закрыть</el-button>            
-          </span>
-        </el-dialog>
-        
-<el-dialog title="Tips" v-model="dialogMapFilterVisible" size="tiny">
-    <span></span>
-    <el-input v-model="postalCodeVal" placeholder="INDX"></el-input>
-    <el-switch on-text="" off-text v-model="postalCodeOpt"></el-switch>
-    <el-input v-model="evntsVal" placeholder="События Заголовок"></el-input>
-    <el-switch on-text="" off-text v-model="evntsOpt"></el-switch>
-
-    <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogMapFilterVisible = false">Отмена</el-button>
-    <el-button type="primary" @click="doFilter">Применить</el-button>
-  </span>
-</el-dialog>
-    </el-col>   
+   <div>
+       <h1></h1>
+       <div id="ymap" style="height:800px"></div>
+   </div>
 </template>
-
 <script>
-    let self = {};
-
+    
+let self = {};
     export default {
-        name: 'mmap',
+        name: 'amap',
         data() {
             return {
-                mymap: {},
                 geoCollection: { removeAll:function(){return true;}},
                 myBalloonContentBodyLayout: {},
                 selectedPO: {},
@@ -66,15 +20,12 @@
                 postalCodeOpt: false,
                 evntsVal: "",
                 evntsOpt: false,
-                fdVisible: false,
-                //
-                dialogMapFilterVisible:false,
-                _route: []
+                fdVisible: false,                
             }
 
         },
         mounted() {
-            console.log('mmap mounted');
+            console.log('amap mounted');
             self = this;
             if (this.mapready) {
                 console.log("mapready in mounted");
@@ -84,73 +35,41 @@
         },
         methods: {
             showMapFilter:function(){
-                this.dialogMapFilterVisible=true;
+                
             },
-            openPODetail: function(selPO) {
-                //console.log(selPO);
-                //this.$store.dispatch('testAction')
-                this.selectedPO = selPO;
-                this.showPODetail = true;
+            openPODetail: function(selPO) {                
+                
             },
             addToSelectedPOList: function(selPO) {
                 this.$store.dispatch('addPOSelectdList', selPO);
-            },
-            doFilter: function(val) {
-                //this.$store.dispatch('filterMap', this.filter);
-                //console.log(val);
-                //var self = this;
-                this.geoCollection.removeAll();
-                this.geoCollection = null;
-                this.geoCollection = new ymaps.GeoObjectCollection();
-                this.$store.state.postOffice.forEach(function(otd) {
-
-                    var _f = self.filter;
-
-                    for (var k in _f) {
-                        //console.log(`${otd.region} ---- ${_f[k]}`);
-                        let res = _f[k](otd);
-                        //console.log(`${otd.postalCode} - ${res} ----- ${_f[k]}`);
-                        if (res) {
-                             var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
-                            self.geoCollection.add(pmark);
-                        }
-
-                    }
-                });
-                this.mymap.geoObjects.add(this.geoCollection);
-                this.fdVisible = false;
-            }
+            }            
         },
         computed: {
-            filterDialogOpen() {
-                return this.$store.state.ymapShowFiltereDialog;
-            },
+            
             pomassive() {                
-                return this.$store.state.postOffice
+                return this.$store.state.selectedPO
             },
-            mapready() {
-                //this.val=true;
+            mapready() {            
                 return this.$store.state.ymapready
             },
-            /*mapfilter() {
-                return this.$store.state.ymapFilter
-            },*/
+            
             makePath() {
                 return this.$store.state.makePath
             },
-            ymapDataUpdate()
-            {
-                //return this.$store.state.ymapDataUpdate
+            destroyPath(){
+                return this.$store.state.destroyPath
             }
         },
         watch: {
             pomassive:function(n,o)
             {                 
+                    if (this._route)
+                        this.mymap.geoObjects.remove(this._route);
                     self.geoCollection.removeAll();                                
                     self.geoCollection = null;
                     self.myBalloonContentBodyLayout = customBCBL();
                     self.geoCollection = new ymaps.GeoObjectCollection();
-                    self.$store.state.postOffice.forEach(function(otd) {
+                    self.$store.state.selectedPO.forEach(function(otd) {
                         var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
                         self.geoCollection.add(pmark);                        
                     });
@@ -172,19 +91,13 @@
                                 }else{
                                     return false;
                                 }`;
-                this.filter.postalCode = new Function('obj', foobody);                
+                this.filter.postalCode = new Function('obj', foobody);
             },
             postalCodeOpt: function(n, o) {
                 console.log('watcher evnts ' + n);
             },
             evntsVal: function(n, o) {
                 console.log('watcher evnts ' + n);
-                var foobody = `if (obj.postalCode.search('${n}')>-1){
-                                    return true;
-                                }else{
-                                    return false;
-                                }`;
-                this.filter.evntsval = new Function('obj', foobody);
             },
             evntsOpt: function(n, o) {
                 console.log('watcher evnts ' + n);
@@ -212,7 +125,7 @@
                 }
             },
             mapfilter: function(val) {
-                console.log('map filter');
+                //console.log(val);
                 var self = this;
                 this.geoCollection.removeAll();
                 this.geoCollection = null;
@@ -222,7 +135,8 @@
                     var _f = self.$store.state.ymapFilter;
 
                     for (var k in _f) {
-                        let res = _f[k](otd);                        
+                        let res = _f[k](otd);
+                        //console.log(`${otd.postalCode} - ${res}`);
                         if (res) {
                             var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
                             self.geoCollection.add(pmark);
@@ -239,7 +153,9 @@
                 this.mymap.geoObjects.add(this.geoCollection);
             },
             makePath: function() {
-                let self = this;
+                if(this.$store.state.makePath)
+                {
+                    let self = this;
                 this.geoCollection.removeAll();
                 if (this._route)
                     this.mymap.geoObjects.remove(this._route);
@@ -267,63 +183,39 @@
                         alert("Возникла ошибка: " + error.message);
                     }
                 );
+                    this.$store.commit('MAKEPATHCOMPLETE');
+                }          
+            },
+            destroyPath:function(){
+                if(this.$store.state.destroyPath){
+                    
+                    if (this._route)
+                    this.mymap.geoObjects.remove(this._route);
+                    
+                    self.geoCollection.removeAll();                                
+                    self.geoCollection = null;
+                    self.myBalloonContentBodyLayout = customBCBL();
+                    self.geoCollection = new ymaps.GeoObjectCollection();
+                    self.$store.state.selectedPO.forEach(function(otd) {
+                        var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
+                        self.geoCollection.add(pmark);                        
+                    });
+                    self.mymap.geoObjects.add(self.geoCollection);
+                    this.$store.commit('DESTROY_PATH_COMPLETE');
+                }      
             }
         },
     }
    
     function mapRender() {        
-        //self.geoCollection = new ymaps.GeoObjectCollection();
-        //self.myBalloonContentBodyLayout = customBCBL();
-        self.mymap = new window.ymaps.Map("mapy", {
+        self.mymap = new window.ymaps.Map("ymap", {
             center: [50.59, 36.58],
             zoom: 10,
             controls: ['routeEditor']
         });
         self.$store.dispatch('ymaprender');
-        /*self.$store.state.postOffice.forEach(function(otd) {
-            var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
-            self.geoCollection.add(pmark);
-        });
-        self.mymap.geoObjects.add(self.geoCollection);*/
-    }
-    /* function owalk(otd, filter) {
-         for (var k in otd) {
-             if (typeof otd[k] === 'object' && filter[k]) {
-                 console.log(k);
-                 if (Array.isArray(otd[k])) {
-                     console.log('array ' + k);
-                     var arr = otd[k];
-                     var farr = filter[k];
-                     for (var i = 0; i < arr.length; i++) {
-                         for (var kk in farr) {
-                             if (farr[kk].options) {
-                                 if (farr[kk].val.toString() === arr[i][kk].toString())
-                                     return true;
-                             } else {
-                                 if (arr[i][kk].toString().search(farr[kk].val.toString()) != -1)
-                                     return true;
-                             }
-                         }
-                     }
-                 } else {
-                     owalk(otd[k], filter[k]);
-                 }
-             } else if (filter[k]) {
-                 let opValStr = otd[k].toString();
-                 let filterValStr = filter[k].val.toString();
-                 if (filter[k].options) {
-                     if (opValStr === filterValStr) {
-                         return true;
-                     }
-                 } else {
-                     if (opValStr.search(filterValStr) != -1) {
-                         return true;
-                     }
-                 }
-
-             }
-         }
-     }*/
+        
+    }  
 
     function customBCBL() {
         var myBalloonContentBodyLayout = ymaps.templateLayoutFactory.createClass(
@@ -342,16 +234,9 @@
                     });
 
                 },
-                clear: function() {
-                    /* $('#show-po-detail-btn').off('click', this.onShowPODetailClick);*/
+                clear: function() {    
                     myBalloonContentBodyLayout.superclass.clear.call(this);
-                },
-                /*onShowPODetailClick: function (e) {
-                    poDetail.init(e.data.po.data, myMap);
-                },
-                onAddToPathClick: function (e) {
-                    pathList.addElement(e.data.po.data);
-                }*/
+                },            
             });
         return myBalloonContentBodyLayout;
     }
@@ -379,7 +264,6 @@
 
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     h1,
     h2 {

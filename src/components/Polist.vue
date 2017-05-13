@@ -1,6 +1,21 @@
 <template>
-<el-col :span="5">
-<el-tree
+<div class="m-panel">
+   <h1>Список</h1>
+    <el-button-group class="list-buttongr">
+        <el-button type="primary" @click="">
+            <icon name="check-circle"></icon>
+        </el-button>
+        <el-button type="danger" @click="">
+            <icon name="ban"></icon>
+        </el-button>
+        <el-button type="default" @click="">
+            <icon name="truck"></icon>
+        </el-button>
+        <el-button type="default" @click="">
+            <icon name="list"></icon>            
+        </el-button>          
+    </el-button-group>    
+   <el-tree
   :data="selectedPO"
   :props="defaultProps"
   show-checkbox
@@ -10,45 +25,8 @@
   :render-content="renderContent"
   @check-change="checkEvntHolder"
   ref="evntstree">
-</el-tree>
-</el-tree>
-<el-button @click="makePath" v-show="cpb">Создать маршрут</el-button>
-<!-- создать собывтие или пачку событий по нажатию кнопки содаются события для отмеченных из списка отделений через чекбокс, событие добавляется из модалотьного окна -->
-<el-button @click="showNewEvnt=true" v-show="cpb">Создать событие</el-button>
-<h1 v-show="cpb">true</h1>
- <el-dialog title="Подробная информация" v-model="showEvntDetail" size="tiny">
-     <span>Мероприятие -  {{sEvnt.title}}</span>
-            <el-input v-model="sEvnt.postalCode" placeholder=""></el-input>
-            <el-input v-model="sEvnt.start" placeholder=""></el-input>
-            <el-input v-model="sEvnt.end" placeholder=""></el-input>
-            <el-input v-model="sEvnt.status" placeholder=""></el-input>
-            <el-input v-model="sEvnt.description" placeholder=""></el-input>            
-            <el-input v-model="sEvnt.executor" placeholder=""></el-input>                       
-            <span slot="footer" class="dialog-footer">
-            <el-button @click="showEvntDetail = false">Закрыть</el-button>            
-          </span>
- </el-dialog>
-
-
-<!-- new evnt modal-->
-<el-dialog title="Создание нового события" v-model="showNewEvnt" size="tiny">
-         <span>Заголовок</span>
-          <el-input v-model="newEvnt.title" placeholder=""></el-input>
-           <el-input v-model="newEvnt.postalCode" placeholder=""></el-input>
-            <el-date-picker v-model="newEvnt.start" type="datetime" placeholder="Select date and time">
-    </el-date-picker>
-           <el-date-picker v-model="newEvnt.end" type="datetime" placeholder="Select date and time">
-    </el-date-picker>
-            <el-input v-model="newEvnt.status" placeholder=""></el-input>
-            <el-input v-model="newEvnt.description" placeholder=""></el-input>            
-            <el-input v-model="newEvnt.executor" placeholder=""></el-input>                       
-            <span slot="footer" class="dialog-footer">
-            <el-button @click="showNewEvnt = false">Закрыть</el-button>
-            <el-button @click="saveNewEvnt">Сохранить</el-button>                        
-          </span>
- </el-dialog>
-
-</el-col>     
+    </el-tree>
+</div>
 </template>
 <script>
     import moment from 'moment'
@@ -58,7 +36,7 @@
     let id = 1000;
 
     export default {
-        name: 'evntslist',
+        name: 'polist',
         data() {
       return {
         cpb:this.createPathBtn,  
@@ -154,6 +132,14 @@
       }
     }
   }
-    
-
 </script>
+<style>
+    .el-tree{
+        height: 600px;
+        overflow: scroll;
+    }
+    .list-buttongr{
+        margin-bottom: 10px;
+    }
+   
+</style>

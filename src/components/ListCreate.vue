@@ -3,17 +3,20 @@
     <h1>{{ msg }}</h1>    
     <evntslist createPathBtn="true"></evntslist>
     <mmap></mmap>
+    <el-col :span="16">
+    </el-col>
   </div>
 </template>
 
 <script>
     import Evntslist from 'src/components/Evntslist.vue'
     import Mmap from 'src/components/Mmap.vue'
+    
 
     export default {
         name: 'vrvtest',
         components: {
-            Mmap,
+            Mmap,            
             Evntslist
         },
         data() {

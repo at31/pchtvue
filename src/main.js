@@ -11,11 +11,13 @@ sync(store, router)
 import ElementUI from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/ru-RU'
 import 'element-ui/lib/theme-default/index.css'
+import 'vue-awesome/icons'
+import Icon from 'vue-awesome/components/Icon' // font awesome
 
 Vue.use(ElementUI,{ locale })
 
 Vue.config.productionTip = false
-
+Vue.component('icon', Icon)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
