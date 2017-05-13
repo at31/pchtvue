@@ -20,28 +20,42 @@
         <el-button type="default" @click="detailWork">
             <icon name="list"></icon>            
         </el-button>        
-    </el-button-group>    
-   <el-table :data="selectedPO" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange">
-  <el-table-column type="selection" width="55">
-    </el-table-column>
-    <el-table-column label="Индекс" prop="label" sortable>      
-    </el-table-column>
-    <el-table-column label="Заданий" sortable prop="evntsLength">
-      <!--template scope="scope">
-          <p>{{scope.row.evnts.length}}</p>
-      </template-->
-    </el-table-column>
-    <el-table-column label="Действия">
-      <template scope="scope">
-        <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-            <icon name="info-circle"></icon>
-        </el-button>
-        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-            <icon name="trash"></icon>
-        </el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+    </el-button-group>
+    
+    <el-tabs>
+        <el-tab-pane label="Отделения" >
+            <el-table :data="selectedPO" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="potable">
+              <el-table-column type="selection" width="55">
+                </el-table-column>
+                <el-table-column label="Индекс" prop="label" sortable>      
+                </el-table-column>
+                <el-table-column label="Заданий" sortable prop="evntsLength">
+                  <!--template scope="scope">
+                      <p>{{scope.row.evnts.length}}</p>
+                  </template-->
+                </el-table-column>
+                <el-table-column label="Действия">
+                  <template scope="scope">
+                    <el-button size="small" @click="showDetail(scope.$index, scope.row)">
+                        <icon name="info-circle"></icon>
+                    </el-button>
+                    <el-button size="small" type="danger" @click.native.prevent="handleDelete(scope.$index, scope.row)">
+                        <icon name="trash"></icon>
+                    </el-button>
+                  </template>
+                </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="Заявки / работы" >
+            
+        </el-tab-pane>
+        <el-tab-pane label="Hard" >
+            
+        </el-tab-pane>
+        <el-tab-pane label="Soft" >
+            
+        </el-tab-pane>
+    </el-tabs>                
 </div>
 </template>
 <script>
@@ -68,7 +82,16 @@
     },
      mounted() {
             //console.log(this.cpb);
-     },    
+     },
+    updated(){        
+         this.selectedPO.forEach(po => {             
+            if(po.fixed){
+                console.log(po);
+                this.$refs.potable.toggleRowSelection(po, true);                
+            }            
+          });
+       // console.log(this.multipleSelection);
+    },    
     //props:{createPathBtn:Boolean},
     props:["createPathBtn"],    
     computed:{
@@ -90,7 +113,7 @@
     },
     unfixValues(){
         this.$store.commit('UNFIX_SELECTED_VALUES_OP');
-    },
+    },    
     createPath(){
          this.$store.dispatch('makePath');
     },
@@ -100,67 +123,18 @@
     detailWork(){},    
     handleSelectionChange(val) {
       	//console.log(val);
-        this.multipleSelection = val;
+        this.multipleSelection = val;        
+    },
+    toggleRowSelect(rows,row){
+        this.$store.commit('TOGGLEFIX_OP',row);
     },    
-    handleEdit(index, row) {
-        console.log(index, row);
+    showDetail(index, row) {
+        this.$store.commit('SHOW_OP_DETAIL',row)
+        //console.log(index, row);
       },
     handleDelete(index, row) {
-        console.log(row);
-      },    
-    saveNewEvnt:function(){ 
-            let poarr=this.$refs.evntstree.getCheckedNodes();
-        //console.log(poarr);
-            let evntarr=[];
-            if(poarr.length>0) 
-            {                
-                for(var i=0;i<poarr.length;i++)
-                {
-                    if(poarr[i].hasOwnProperty('evnts'))
-                    {
-                         evntarr.push({
-                            title:this.newEvnt.title,
-                            start:this.newEvnt.start,
-                            end:this.newEvnt.end,
-                            postalCode:poarr[i].postalCode,
-                            status:this.newEvnt.status,
-                            description:this.newEvnt.description,
-                            executor:this.newEvnt.executor
-                        });
-                        //console.log(poarr[i].postalCode);       
-                    }                     
-                }                
-            }
-            if(evntarr.length>0)
-            {
-                axios.post(`http://127.0.0.1:3000/evnt/save/multi`,evntarr)
-                 .then(response => {
-                    this.$store.dispatch('ymaprender');
-                    //console.log(response.data)                    
-                })
-                 .catch(e => {console.log(e)});                
-            }             
-        },
-    checkEvntHolder:function(){
-            //console.log(this.$refs.evntstree.getCheckedNodes());
-            //console.log(this.$refs.evntstree.getCheckedKeys());
-        },    
-    makePath:function(){
-          this.$store.dispatch('makePath');
-          //console.log(JSON.stringify(this.$store.state.route));
-      },        
-      showevnt(store, data) {
-        //store.append({ id: id++, label: 'testtest', children: [] }, data);
-          this.sEvnt=data;
-          this.sEvnt.start=moment(data.start).format('YYYY-MM-DD hh:mm');
-          this.sEvnt.end=moment(data.end).format('YYYY-MM-DD hh:mm');
-          this.showEvntDetail=true;
-      },
-
-      remove(store, data) { 
-        //нужно изменить порядок, сначала удалять из глобального $store и если это не родитель то запускать удаление   store.remove(data);... сейчас дерево рендерится два раза подряд, что не есть гуд в итоге.
-        store.remove(data);          
-        this.$store.dispatch('removePOSelectedList',data);
+        this.$store.commit('SELECTEDPO_DELETE_ONE',row);
+        //console.log(row);
       }
     }
   }

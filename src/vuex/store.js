@@ -19,7 +19,9 @@ const state = {
     makePath:false,
     destroyPath:false,
     opFilterDialogVisible:false,
-    opDetailVisible:false
+    opDetailVisible:false,
+    detailPO:"",
+    showOPDetail:false
 }
 
 const actions = {
@@ -43,7 +45,7 @@ const actions = {
                 //alert(response.status) // 200
                 return response.json()
             }).then(function (data) {
-                console.log(data);
+                //console.log(data);
                 context.commit('ADD_TEST',data)
 
             });
@@ -119,7 +121,7 @@ const actions = {
                 return chld;
             })
         };
-        console.log(listel);
+        //console.log(listel);
         context.commit('SELECTED_PO_ADD',listel);
     },
     removePOSelectedList(context,listel){
@@ -135,7 +137,17 @@ const actions = {
 }
 
 const mutations = {
-        
+        SHOW_OP_DETAIL(state,dpo){
+            state.detailPO=false;
+            state.postOffice.forEach(po=>{
+                if(dpo.postalCode==po.postalCode){
+                    state.detailPO=po;                    
+                }
+            });
+        },
+        HIDE_OP_DETAIL(state){
+            
+        },
         OP_FILTER_DIALOG_VISIBLE(state){
             state.opFilterDialogVisible=state.opFilterDialogVisible?fale:true;
         },
@@ -152,6 +164,10 @@ const mutations = {
         },
         DESTROY_PATH_COMPLETE(state){
             state.destroyPath=false;
+        },
+        SELECTEDPO_DELETE_ONE(state,po){
+            var indx=state.selectedPO.indexOf(po);
+            state.selectedPO.splice(indx,1);
         },
         SELECTED_PO_ADD(state,listel){            
             state.selectedPO.push(listel);
@@ -263,6 +279,9 @@ const mutations = {
                 });
                 state.selectedPO=arr;
             }            
+        },
+        TOGGLEFIX_OP(state,op){
+            op.fixed=op.fixed?false:true;
         },
         FIX_SELECTED_VALUES_OP(state,selected){
             selected.forEach(function(o){
