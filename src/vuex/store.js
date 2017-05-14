@@ -21,7 +21,9 @@ const state = {
     opFilterDialogVisible:false,
     opDetailVisible:false,
     detailPO:"",
-    showOPDetail:false
+    showOPDetail:false,
+    detailEvnt:"",
+    showCreateNew:false
 }
 
 const actions = {
@@ -89,6 +91,9 @@ const actions = {
             });
         */
     },
+    saveNewEvnt(context,nevnt){
+        
+    },
     addPOSelectdList(context,po){
         
         /*var listel=po;
@@ -137,6 +142,13 @@ const actions = {
 }
 
 const mutations = {
+        SHOW_NEW_EVNT_DIALOG(state,st){
+            state.showCreateNew=st;
+        },
+        SHOW_EVNT_DETAIL(state,evnt){        
+            state.detailEvnt=false;
+            state.detailEvnt=evnt;
+        },
         SHOW_OP_DETAIL(state,dpo){
             state.detailPO=false;
             state.postOffice.forEach(po=>{

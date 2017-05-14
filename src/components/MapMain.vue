@@ -59,10 +59,24 @@
             </el-tabs>
             
             <span slot="footer" class="dialog-footer">
-            <el-button @click="showPODetail = false">Закрыть</el-button>            
+            <el-button @click="showInfo = false">Закрыть</el-button>            
           </span>
         </el-dialog>
         
+        <el-dialog title="Подробная информация" v-model="showEvntInfo" size="small"  @close="onDetailEvntClose">
+          <span>Отделение -  {{evnt.postalCode}}</span>           
+                        <p>
+                            <h3>{{evnt.title}}</h3>
+                            <h4>{{evnt.mstart}} - {{evnt.mend}}</h4>                            
+                            <h4>{{evnt.status}}</h4>                            
+                            <h4>{{evnt.executor}}</h4>                            
+                            <h4>{{evnt.description}}</h4>
+                            <hr>
+                        </p>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showEvntInfo = false">Закрыть</el-button>            
+            </span>
+        </el-dialog>        
        </el-row>       
 </template>
 
@@ -74,6 +88,7 @@
     import Mapfilter from 'src/components/Mapfilter.vue'
     import Polist from 'src/components/Polist.vue'
     import Potable from 'src/components/Potable.vue'
+    import Newevnt from 'src/components/Newevnt.vue'
     
     moment().locale('ru');
     
@@ -83,7 +98,10 @@
             return {
                 msg:"",
                 showInfo:false,
-                po:{}
+                showEvntInfo:false,
+                po:{},
+                evnt:{},
+                showNewEvntDialog:false
                 
             }
         },
@@ -91,7 +109,8 @@
             Amap,
             Mapfilter,
             Polist,
-            Potable
+            Potable,
+            Newevnt
         },
         mounted() {        
             this.$store.dispatch('ymapstart');
@@ -99,16 +118,22 @@
         methods:{
             onDetailClose(){
                 this.po={};
+            },
+            onDetailEvntClose(){
+                this.evnt={};
             }
         },
         computed:{
             showPODetail(){
                 return this.$store.state.detailPO;
+            },
+            showEvntDetail(){
+                return this.$store.state.detailEvnt;                
             }
         },
         watch:{
             showPODetail:function(n,o){
-                console.log(n);
+                //console.log(n);
                 if(n){
                     this.po=n;
                     this.po.evnts.forEach(evnt=>{
@@ -117,6 +142,14 @@
                     });                    
                     this.showInfo=true;                   
                 }            
+            },
+            showEvntDetail(evnt){
+                if(evnt){
+                    this.evnt=evnt;
+                    this.evnt.mstart=moment(evnt.start).format('YYYY-MM-DD hh:mm');
+                    this.evnt.mend=moment(evnt.end).format('YYYY-MM-DD hh:mm');
+                    this.showEvntInfo=true;
+                }                
             }
         }
     }

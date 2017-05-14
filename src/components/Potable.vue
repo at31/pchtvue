@@ -22,8 +22,8 @@
         </el-button>        
     </el-button-group>
     
-    <el-tabs>
-        <el-tab-pane label="Отделения" >
+    <el-tabs @tab-click="handleTabClick" v-model="activeName">
+        <el-tab-pane label="Отделения" name="first">
             <el-table :data="selectedPO" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="potable">
               <el-table-column type="selection" width="55">
                 </el-table-column>
@@ -46,13 +46,23 @@
                 </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="Заявки / работы" >
+        <el-tab-pane label="Заявки / работы" name="second">
+            <el-select v-model="evntTypeFilter" multiple placeholder="Выберите тип" @change="onChangeEvntTypeFilter">
+                <el-option v-for="type in evnttype" :key="type" :label="type" :value="type">                    
+                </el-option>                 
+              </el-select>
+              <ul id="">
+                     <li v-for="evnt in evnts">
+                     {{evnt.label}} - 
+                     <a href="#" @click.prevent="onShowEvntDetail(evnt)">Детали</a>
+                     <a href="#" @click.prevent="onDeleteEvntFromEvntsList(evnt)">Удалить</a>
+                      </li>
+                </ul>
+        </el-tab-pane>
+        <el-tab-pane label="Hard" name="third">
             
         </el-tab-pane>
-        <el-tab-pane label="Hard" >
-            
-        </el-tab-pane>
-        <el-tab-pane label="Soft" >
+        <el-tab-pane label="Soft" name="fourth">
             
         </el-tab-pane>
     </el-tabs>                
@@ -76,20 +86,25 @@
         showEvntDetail:false,
         showNewEvnt:false,
           
-        multipleSelection: []  
-
+        activeName: 'first',  
+        multipleSelection: [],
+        evntTypeFilter:[], //сюда собирается выбор селекта
+        evnttype:[],  //текст для селекта
+        evnts:[] // all evnts  
       }
     },
-     mounted() {
+    mounted() {
             //console.log(this.cpb);
      },
-    updated(){        
+    updated(){                
          this.selectedPO.forEach(po => {             
             if(po.fixed){
-                console.log(po);
-                this.$refs.potable.toggleRowSelection(po, true);                
+                //console.log(po);
+                this.$refs.potable.toggleRowSelection(po, true);                                
             }            
           });
+        
+        
        // console.log(this.multipleSelection);
     },    
     //props:{createPathBtn:Boolean},
@@ -98,8 +113,63 @@
         selectedPO:function(){            
             return this.$store.state.selectedPO;
         }
+    },
+    watch:{
+        selectedPO(){
+            let typeset=new Set();
+            let to={};
+            this.evnts.forEach(evnt=>{
+                if(to.hasOwnProperty(evnt.postalCode)){
+                    to[evnt.postalCode].push(evnt);
+                }else{
+                    to[evnt.postalCode]=[evnt];
+                }
+            });
+            this.evnts=[];
+            this.selectedPO.forEach(po=>{
+               if(to.hasOwnProperty(po.postalCode)){
+                   this.evnts=this.evnts.concat(to[po.postalCode]);
+               }else{
+                 po.evnts.forEach(evnt=>{
+                    this.evnts.push(evnt);
+                });  
+               }                 
+            });
+            this.evnts.forEach(evnt=>{
+                typeset.add(evnt.title); 
+            });
+            this.evnttype=[...typeset];
+        }
     },    
     methods: {
+    onShowEvntDetail(evnt){
+        this.$store.commit('SHOW_EVNT_DETAIL',evnt);
+    },
+    onDeleteEvntFromEvntsList(evnt){
+        let indx=this.evnts.indexOf(evnt);
+        this.evnts.splice(indx,1);
+    },
+    onChangeEvntTypeFilter(val){
+        this.evnts=[];
+        this.selectedPO.forEach(po=>{
+            po.evnts.forEach(evnt=>{
+                if(val.length==0){
+                    this.evnts.push(evnt);
+                }else if(val.length>0){
+                    if(val.indexOf(evnt.title)!=-1){
+                        this.evnts.push(evnt);
+                    }
+                }                              
+            })
+        });
+    },    
+    handleTabClick(tab){
+        //tab.name
+        if(tab.name=='second'){
+            
+            
+        }//tab second end
+    },    
     removeUnselected(){
         this.$store.commit('REMOVE_UNSELECTED');
     },    

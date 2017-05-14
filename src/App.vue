@@ -6,28 +6,38 @@
    <el-menu-item index="2" @click="goMapMain">Карта - главная</el-menu-item>
   <el-menu-item index="3" @click="goListCreate">Создание списка (карта)</el-menu-item>
   <el-submenu index="4">
-    <template slot="title">Карта</template>
-<el-menu-item @click="filterShow" index="4-1">Фильтр</el-menu-item>
+    <template slot="title">Заявки / работы</template>
+<el-menu-item @click="createNewEvnt" index="4-1">Создать новую</el-menu-item>
 </el-submenu>
 <el-menu-item index="5" @click="goLists">Списки</el-menu-item>
 </el-menu>
 <div class="line"></div>
 <router-view></router-view>
 </el-row>
+<newevnt v-bind:showNewEvnt="showNewEvntDialog"></newevnt>
 </div>
 </template>
 
 <script>
-    export default {
+    import moment from 'moment'
+    //import axios from 'axios'        
+    import Newevnt from 'src/components/Newevnt.vue'
+    moment().locale('ru');
+    
+    
+    export default {                    
         name: 'app',
-        /*components: {
-          Toolbar,
-          Evntslist, 
-          Mmap
-        },*/
+        data () {
+            return {
+                showNewEvntDialog:false
+            }
+        },
+        components: {
+          Newevnt          
+        },        
         methods: {
-            filterShow: function() {
-                this.$store.commit('YMAP_SHOW_FILTER_DIALOG');
+            createNewEvnt: function() {
+                this.$store.commit('SHOW_NEW_EVNT_DIALOG', true);
             },
             showObj: () => {
                 //  console.log(this)
