@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 
-import {f,getAllPO} from '../components/GetData.js'
+//import {f,getAllPO} from '../components/GetData.js'
 
 Vue.use(Vuex)
 
@@ -23,10 +23,20 @@ const state = {
     detailPO:"",
     showOPDetail:false,
     detailEvnt:"",
-    showCreateNew:false
+    showCreateNew:false,
+    mapSetCenter:"",
+    //lists
+    listsAll:[],
+    listsSelectedPO:[],
+    listsEvtsList:[]
 }
 
 const actions = {
+    //lists
+    getListsAll(context,filter){
+        
+    },
+    //
     testAction(context) {
         // console.log(context)
         window.ymaps.ready(function () {
@@ -78,22 +88,46 @@ const actions = {
     ymaprender(context)
     {
         context.commit('YMAPRENDER', true);
-        var ff=getAllPO();        
+        /*var ff=getAllPO();        
         ff.then(function (data) {
                 context.commit('PO_LOADED',data);                
-            });
+            });*/
             /*fetch('http://127.0.0.1:3000/po/all').then(function (response) {
                 //alert(response.headers.get('Content-Type')); // application/json; charset=utf-8
                 //alert(response.status) // 200
                 return response.json()
             }).then(function (data) {
                 context.commit('PO_LOADED',data);                
-            });
-        */
-    },
-    saveNewEvnt(context,nevnt){
+            });*/
+        axios.get('http://127.0.0.1:3000/po/all').then(response=>{
+            if(response.status==200){
+                context.commit('PO_LOADED',response.data);
+            }
+        }).catch(err=>{
+            console.log(err);
+        });
         
     },
+    saveNewEvnt(context,nevnt){        
+        let evntarr=[];
+        context.state.selectedPO.forEach(po=>{
+            let poevnt=Object.assign({}, nevnt);
+            poevnt.postalCode=po.postalCode;
+            console.log(poevnt);
+            //poevnt.start=nevnt.start;
+            //poevnt.end=nevnt.end;
+            evntarr.push(poevnt);
+        });
+        if(evntarr.length>0){
+            console.log('send axios post');
+            axios.post(`http://127.0.0.1:3000/evnt/save/multi`,evntarr)
+                 .then(response => {            
+                    context.dispatch('ymaprender');                   
+                })
+                 .catch(e => {console.log(e)});     
+        }           
+    },
+    
     addPOSelectdList(context,po){
         
         /*var listel=po;
@@ -268,7 +302,7 @@ const mutations = {
 
         PO_LOADED(state,massive) {
             state.postOffice=massive;
-            if(Object.getOwnPropertyNames(state.ymapFilter).length>1)
+            /*if(Object.getOwnPropertyNames(state.ymapFilter).length>1)
             {
                 state.postOffice.forEach(function(otd) {
                     var _f = self.filter;
@@ -284,16 +318,31 @@ const mutations = {
 
                     }
                 });
+            }*/
+            var arr=[];
+            if(state.selectedPO.length>0){
+               state.selectedPO.forEach(spo=>{
+                   state.postOffice.forEach(el=>{
+                       if(el.postalCode==spo.postalCode)
+                       {
+                           arr.push(prepData4ListView(el));
+                       }
+                   });
+               });
             }else
             {   
                 var arr=massive.map(function(otd){
                     return prepData4ListView(otd);
-                });
-                state.selectedPO=arr;
-            }            
+                });                
+            }
+            
+            state.selectedPO=arr;
         },
         TOGGLEFIX_OP(state,op){
             op.fixed=op.fixed?false:true;
+            if(op.fixed){
+                state.mapSetCenter=[op.latitude,op.longitude];
+            }
         },
         FIX_SELECTED_VALUES_OP(state,selected){
             selected.forEach(function(o){

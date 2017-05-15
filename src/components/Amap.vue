@@ -58,9 +58,18 @@ let self = {};
             },
             destroyPath(){
                 return this.$store.state.destroyPath
+            },
+            setNewCenter(){
+                return this.$store.state.mapSetCenter
             }
+            
         },
         watch: {
+            setNewCenter:function(newcenter){
+                this.mymap.setCenter(newcenter, 12);
+                //let panarr=this.$store.state.selectedPO.map(po=>{return [po.latitude,po.longitude]});
+                //this.mymap.panTo(panarr);
+            },
             pomassive:function(n,o)
             {                 
                     if (this._route)
