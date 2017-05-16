@@ -1,15 +1,15 @@
 <template>
     <div>
-        <el-tabs @tab-click="handleTabClick" v-model="activeName">
+        <el-tabs v-model="activeName">
         <el-tab-pane label="Все списки заданий" name="first">
-            <el-table :data="selectedPO" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="listsall">
-              <el-table-column type="selection" width="55">
+            <el-table :data="listsAll" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @current-change="handleSelectionChange"  ref="listsall" highlight-current-row>
+                <el-table-column label="Исполнитель" prop="executor.fio" sortable>      
                 </el-table-column>
-                <el-table-column label="Исполнитель" prop="user.fio" sortable>      
+                <el-table-column label="Отд." sortable prop="listsAllPOs">                  
                 </el-table-column>
-                <el-table-column label="Отд." sortable prop="listsLength">                  
-                </el-table-column>
-                <el-table-column label="Заявки" prop=evntsAllLength>                  
+                <el-table-column label="Заявки" prop="listsAllEvnts"></el-table-column>
+                <el-table-column label="Название" prop="title"></el-table-column>
+                <el-table-column label="Описание" prop="description">                   
                 </el-table-column>
           </el-table>
         </el-tab-pane>
@@ -32,6 +32,7 @@
 
 <script>
     export default {
+        name: 'listsall',
         data () {
            var validatePostalCode = (rule, value, callback) => {                 
                  if (value === '') {
@@ -53,10 +54,45 @@
                         { validator: validatePostalCode, trigger: 'blur' } 
                     ]
                 },
-                filter:{}
+                filter:{},
+                currentRow: null,
+                activeName: 'first'
             }
         },
-        components: {
+        watch:{
+            
+        },
+        computed:{
+            listsAll:function(){
+                return this.$store.state.listsAll;
+            }
+        },
+        methods:{
+            handleSelectionChange(currentRow, oldCurrentRow) {
+                this.currentRow = currentRow;
+                this.$store.commit('LISTSALL_SELECTED',currentRow);
+            },
+            setCurrent(row) {
+                console.log(row);
+                this.$refs.listsall.setCurrentRow(row);
+            },
+            submitForm(formName)
+            {
+                console.log(this.$refs[formName]);
+                /*this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        console.log('submit!');
+                        this.$store.dispatch('filterMap', this.filter);
+                        //console.log(this.filter);
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }                
+                });*/
+            },
+            removeFilter(){
+                //this.$store.dispatch('removeFilterMap');
+            }
         }
     }
 </script>

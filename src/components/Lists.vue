@@ -1,19 +1,26 @@
 <template>
   <div class="listcreate">
-    <h1>{{ msg }}</h1>    
-    <evntslist v-bind:createPathBtn="false"></evntslist>
+    <h1>{{ msg }}</h1>
+      <el-col :span="8">
+          <listsall></listsall>
+      </el-col>
+      <el-col :span="8">
+          <listevnt v-bind:createPathBtn="false"></listevnt>
+      </el-col>    
   </div>
 </template>
 
 <script>
-    import Evntslist from 'src/components/Evntslist.vue'
+    import Listsall from 'src/components/lists/Listsall.vue'
+    import Listevnt from 'src/components/lists/Listevnt.vue'
     //import Mmap from 'src/components/Mmap.vue'
 
     export default {
         name: 'at1',
         components: {
           //  Mmap,
-            Evntslist
+            Listevnt,
+            Listsall
         },
         data() {
             return {
@@ -22,9 +29,10 @@
         },
         props:['msg'],
         mounted() {
+            
             //console.log('ymapstart dispatch');
             //console.log(JSON.stringify(this.$store.state.route));
-            //this.$store.dispatch('ymapstart');
+            this.$store.dispatch('getListsAll');
         }
     }
 

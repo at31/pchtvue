@@ -28,13 +28,30 @@ const state = {
     //lists
     listsAll:[],
     listsSelectedPO:[],
-    listsEvtsList:[]
+    selectedlistsAll:[]
 }
 
 const actions = {
     //lists
     getListsAll(context,filter){
-        
+        axios.get('http://127.0.0.1:3000/lists/all').then(response=>{
+            if(response.status==200){
+                var data=response.data;
+                data.forEach(list=>{
+                    console.log(list);
+                   list.listsAllEvnts=list.evnts.length;
+                
+                var set=new Set();
+                    list.evnts.forEach(evnt=>{
+                        set.add(evnt.postalCode);
+                    });                
+                list.listsAllPOs=set.size; 
+                });
+                context.commit('LISTS_LOADED', data);
+            }
+        }).catch(err=>{
+            console.log('ошибка загрузки всех списков $err',err);
+        });
     },
     //
     testAction(context) {
@@ -176,6 +193,14 @@ const actions = {
 }
 
 const mutations = {
+    ////// lists
+        LISTS_LOADED(state,lists){            
+            state.listsAll=lists;
+        },
+        LISTSALL_SELECTED(state,slist){
+            state.selectedlistsAll=slist;
+        },
+    //////
         SHOW_NEW_EVNT_DIALOG(state,st){
             state.showCreateNew=st;
         },
