@@ -1,9 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from 'src/components/Hello'
-import ListCreate from 'src/components/ListCreate'
-import Lists from "src/components/Lists"
-import MapMain from 'src/components/MapMain'
+import Newevnt from 'src/components/evnts/Newevnt'
+import AllLists from 'src/components/lists/AllLists'
+import Listsnewform from 'src/components/lists/Listsnewform'
+import Listsnewmap from 'src/components/lists/Listsnewmap'
+//import Listnewmap from 'src/components/lists/Listnewmap'
+//import Listnewform from "./src/components/lists/Listnewform"
+//import AllLists from "./src/components/lists/AllLists"
 
 Vue.use(Router)
 
@@ -16,23 +20,23 @@ export default new Router({
       props: true    
     },
     {
-      path: '/lcreate',
-      name: 'ListCreate',
-      component: ListCreate,
+      path: '/list-new',
+      name: 'Listsnewmap',
+      component: Listsnewmap,
       props: { name: 'world' } 
           
     },
     {
-        path:"/lists",
-        name:"Lists",
-        component:Lists,
+        path:"/list-new-form",
+        name:"Listsnewform",
+        component:Listsnewform,
         props:{msg:"AT31"}
     },
     {
-        path:"/mapmain",
-        name:"MapMain",
-        component:MapMain,
+        path:"/lists-all",
+        name:"AllLists",
+        component:AllLists,
         props:{msg:"AT31"}
-    }  
+    }
   ]
 })

@@ -1,22 +1,28 @@
 <template>
-  <div class="listcreate">
+  <el-row :gutter="10">
     <h1>{{ msg }}</h1>
-      <el-col :span="8">
+      
+     <transition name="fade">
+      <el-col :span="8" >
           <listsall></listsall>
       </el-col>
-      <el-col :span="8">
+    </transition>
+     <transition name="fade" >
+      <el-col :span="8" >
           <listevnt v-bind:createPathBtn="false"></listevnt>
-      </el-col>    
-  </div>
+      </el-col>
+    </transition>
+      
+
+    </el-row>
 </template>
 
 <script>
     import Listsall from 'src/components/lists/Listsall.vue'
     import Listevnt from 'src/components/lists/Listevnt.vue'
-    //import Mmap from 'src/components/Mmap.vue'
 
     export default {
-        name: 'at1',
+        name: 'alllists',
         components: {
           //  Mmap,
             Listevnt,
@@ -25,14 +31,18 @@
         data() {
             return {
                 //msg: 'lists'
+                hideBlock:false,
+                slide:false
             }
         },
         props:['msg'],
         mounted() {
             
-            //console.log('ymapstart dispatch');
-            //console.log(JSON.stringify(this.$store.state.route));
             this.$store.dispatch('getListsAll');
+            this.$store.dispatch('getUsers');
+        },
+        methods:{
+            
         }
     }
 
@@ -44,5 +54,10 @@
     h2 {
         font-weight: normal;
     }
-
+     .m-panel
+    {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+   
 </style>

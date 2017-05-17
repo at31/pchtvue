@@ -52,6 +52,7 @@
         this.$store.commit('SHOW_NEW_EVNT_DIALOG',false);
     },    
     saveNewEvnt:function(){ 
+        console.log(this.newEvnt.end);
             var nevnt={
                 title:this.newEvnt.title,
                 start:this.newEvnt.start,

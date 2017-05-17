@@ -84,16 +84,15 @@
     import moment from 'moment'
     //import axios from 'axios'
         
-    import Amap from 'src/components/Amap.vue'
-    import Mapfilter from 'src/components/Mapfilter.vue'
-    import Polist from 'src/components/Polist.vue'
-    import Potable from 'src/components/Potable.vue'
-    import Newevnt from 'src/components/Newevnt.vue'
+    import Amap from 'src/components/lists/Amap.vue'
+    import Mapfilter from 'src/components/lists/Mapfilter.vue'
+    import Potable from 'src/components/lists/Potable.vue'
+    import Newevnt from 'src/components/evnts/Newevnt.vue'
     
     moment().locale('ru');
     
     export default {
-        name:"MapMain",
+        name:"listnewmap",
         data () {
             return {
                 msg:"",
@@ -108,7 +107,6 @@
         components: {
             Amap,
             Mapfilter,
-            Polist,
             Potable,
             Newevnt
         },

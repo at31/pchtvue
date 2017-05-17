@@ -190,7 +190,15 @@
     destroyPath(){
         this.$store.dispatch('destroyPath');
     },    
-    detailWork(){},    
+    detailWork(){
+        
+        this.$router.push(
+            {
+                path:"/list-new-form"
+            });  
+        
+        this.$store.commit('PREPARE_NEW_LISTS',this.evnts);
+    },        
     handleSelectionChange(val) {
       	//console.log(val);
         this.multipleSelection = val;        

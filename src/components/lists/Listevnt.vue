@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="m-panel">
         <el-tabs v-model="activeName">
         <el-tab-pane label="Задания из списка" name="first">
             <el-table :data="listsAll.evnts" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="listsallevnt">

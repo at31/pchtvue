@@ -28,17 +28,43 @@ const state = {
     //lists
     listsAll:[],
     listsSelectedPO:[],
-    selectedlistsAll:[]
+    selectedlistsAll:[],
+    users:[],
+    listNew:{evnts:[],executor:"",title:"",description:""}
 }
 
 const actions = {
     //lists
+    saveNewList(context){
+        context.state.listNew.createdDate=new Date();
+        context.state.listNew.created="588530e0bf376a0e34420fa1"; // хак
+        context.state.listNew.evnts=context.state.listNew.evnts.map(evnt=>{
+            return {evnt:evnt.id,postalCode:evnt.postalCode};
+        });
+        console.log(context.state.listNew);
+        axios.post('http://127.0.0.1:3000/lists/new',context.state.listNew)
+            .then(response=>{
+            console.log('new lists saved $response',response);
+            context.state.listNew={evnts:[],executor:"",title:"",description:""};
+        }).catch(err=>{
+            console.log('ошибка записи списка $err', $err);
+        });
+    },
+    getUsers(context){
+        axios.get('http://127.0.0.1:3000/users/all').then(response=>{
+            if(response.status==200){
+                context.commit('USERS_LOADED', response.data);
+            }
+        }).catch(err=>{
+            console.log('ошибка загрузки users $err',err);
+        });
+    },
     getListsAll(context,filter){
+        console.log('dispatch getListsAll command');
         axios.get('http://127.0.0.1:3000/lists/all').then(response=>{
             if(response.status==200){
                 var data=response.data;
                 data.forEach(list=>{
-                    console.log(list);
                    list.listsAllEvnts=list.evnts.length;
                 
                 var set=new Set();
@@ -130,7 +156,6 @@ const actions = {
         context.state.selectedPO.forEach(po=>{
             let poevnt=Object.assign({}, nevnt);
             poevnt.postalCode=po.postalCode;
-            console.log(poevnt);
             //poevnt.start=nevnt.start;
             //poevnt.end=nevnt.end;
             evntarr.push(poevnt);
@@ -194,6 +219,12 @@ const actions = {
 
 const mutations = {
     ////// lists
+        PREPARE_NEW_LISTS(state,evnts){
+            state.listNew.evnts=evnts;
+        },
+        USERS_LOADED(state,users){            
+            state.users=users;
+        },
         LISTS_LOADED(state,lists){            
             state.listsAll=lists;
         },

@@ -1,5 +1,6 @@
 <template>
   <div class="listcreate">
+      
     <h1>{{ msg }}</h1>    
     <evntslist createPathBtn="true"></evntslist>
     <mmap></mmap>
