@@ -26,5 +26,5 @@ new Vue({
   template: '<app/>',
   components: { App },
   
-  // render: h => h(App)
+   //render: h => h(App)
 })

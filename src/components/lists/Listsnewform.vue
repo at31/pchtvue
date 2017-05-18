@@ -11,13 +11,21 @@
     </transition>
      <transition name="fade" v-on:after-leave="afterLeave"  v-on:before-enter="beforeEnter">
       <el-col :span="8" v-show="hideBlock">
-          <listevnt v-bind:createPathBtn="false"></listevnt>
+          <listevnt v-bind:listsAll="listsAll"></listevnt>
       </el-col>
     </transition>
 
       <el-col :span="8" :class="{ slideInRight: slide}">
           <listnew></listnew>
       </el-col>
+      <el-col :span="8" v-if="!hideBlock">
+          <apath v-bind:path="listNew.path"></apath>
+      </el-col>
+      <transition name="fade" v-on:after-leave="afterLeave"  v-on:before-enter="beforeEnter">
+      <el-col :span="8" v-show="!hideBlock">
+          <listevnt v-bind:listsAll="listNew"></listevnt>
+      </el-col>
+    </transition>
 
     </el-row>
 </template>
@@ -26,6 +34,7 @@
     import Listsall from 'src/components/lists/Listsall.vue'
     import Listevnt from 'src/components/lists/Listevnt.vue'
     import Listnew from 'src/components/lists/Listnew.vue'
+    import Apath from 'src/components/lists/Apath.vue'
     //import Mmap from 'src/components/Mmap.vue'
 
     export default {
@@ -34,7 +43,8 @@
           //  Mmap,
             Listevnt,
             Listsall,
-            Listnew
+            Listnew,
+            Apath
         },
         data() {
             return {
@@ -45,11 +55,27 @@
         },
         props:['msg'],
         mounted() {
-            
-            //console.log('ymapstart dispatch');
-            //console.log(JSON.stringify(this.$store.state.route));
-            this.$store.dispatch('getListsAll');
-            this.$store.dispatch('getUsers');
+           
+        },
+        watch:{
+            postOffice:function(){
+                //this.$store.dispatch('getListsAll');
+                //this.$store.dispatch('getUsers');
+            }            
+        },
+        computed:{
+            listsAll:function(){                
+                return this.$store.state.selectedlistsAll;
+            },
+            postOffice:function(){
+                return this.$store.state.postOffice;
+            },
+            showPathMap:function(){
+                return this.$store.state.showPathMap;
+            },
+            listNew:function(){                
+                return this.$store.state.listNew;
+            }
         },
         methods:{
             toggleListAll(){

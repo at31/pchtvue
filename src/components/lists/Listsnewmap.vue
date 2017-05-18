@@ -3,13 +3,7 @@
            <h1>{{ msg }}</h1>                              
        <el-col :span="4">
            <mapfilter></mapfilter>
-       </el-col>
-       <!--el-col :span="16">
-           <amap></amap>
-        </el-col>
-        <el-col :span="4">
-            <polist></polist>
-        </el-col-->
+       </el-col>       
         <el-col :span="14">
            <amap></amap>
         </el-col>
@@ -111,7 +105,7 @@
             Newevnt
         },
         mounted() {        
-            this.$store.dispatch('ymapstart');
+            //this.$store.dispatch('ymapstart');
         },
         methods:{
             onDetailClose(){

@@ -24,14 +24,13 @@ let self = {};
             }
 
         },
-        mounted() {
-            console.log('amap mounted');
+        mounted() { 
             self = this;
+            console.log('mounted amap');
             if (this.mapready) {
-                console.log("mapready in mounted");
-                mapRender();
-            }
-
+                    mapRender();
+                    setMark();
+                }
         },
         methods: {
             showMapFilter:function(){
@@ -71,96 +70,18 @@ let self = {};
                 //this.mymap.panTo(panarr);
             },
             pomassive:function(n,o)
-            {                 
-                    if (this._route)
-                        this.mymap.geoObjects.remove(this._route);
-                    self.geoCollection.removeAll();                                
-                    self.geoCollection = null;
-                    self.myBalloonContentBodyLayout = customBCBL();
-                    self.geoCollection = new ymaps.GeoObjectCollection();
-                    self.$store.state.selectedPO.forEach(function(otd) {
-                        var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
-                        self.geoCollection.add(pmark);                        
-                    });
-                    self.mymap.geoObjects.add(self.geoCollection);                            
-            },
-            ymapDataUpdate:function()
             {
-                
+                setMark();
             },
-            filterDialogOpen: function() {
-                if (!this.fdVisible) {
-                    this.fdVisible = true;
-                }
-            },
-            postalCodeVal: function(n, o) {
-                console.log('n ->' + n + ' o->' + o);
-                var foobody = `if (obj.postalCode.search(${n})>-1){
-                                    return true;
-                                }else{
-                                    return false;
-                                }`;
-                this.filter.postalCode = new Function('obj', foobody);
-            },
-            postalCodeOpt: function(n, o) {
-                console.log('watcher evnts ' + n);
-            },
-            evntsVal: function(n, o) {
-                console.log('watcher evnts ' + n);
-            },
-            evntsOpt: function(n, o) {
-                console.log('watcher evnts ' + n);
-            },
-            mapready: function(val) {
-                self = this;
+           
+            mapready: function(val) {                
                 console.log('map ready -> ' + val);
 
                 if (val) {
-                    mapRender();
-                    /*this.geoCollection = new ymaps.GeoObjectCollection();
-                    this.myBalloonContentBodyLayout = customBCBL();
-
-                    this.mymap = new window.ymaps.Map("mapy", {
-                        center: [50.59, 36.58],
-                        zoom: 10,
-                        controls: ['routeEditor']
-                    });
-
-                    this.$store.state.postOffice.forEach(function(otd) {
-                        var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
-                        self.geoCollection.add(pmark);
-                    });
-                    this.mymap.geoObjects.add(self.geoCollection);*/
+                    mapRender();                    
                 }
             },
-            mapfilter: function(val) {
-                //console.log(val);
-                var self = this;
-                this.geoCollection.removeAll();
-                this.geoCollection = null;
-                this.geoCollection = new ymaps.GeoObjectCollection();
-                this.$store.state.postOffice.forEach(function(otd) {
-
-                    var _f = self.$store.state.ymapFilter;
-
-                    for (var k in _f) {
-                        let res = _f[k](otd);
-                        //console.log(`${otd.postalCode} - ${res}`);
-                        if (res) {
-                            var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
-                            self.geoCollection.add(pmark);
-                        }
-
-                    }
-                    /*let res = owalk(otd, self.$store.state.ymapFilter);
-                    if (res) {
-                        console.log(JSON.stringify(otd));
-                        var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
-                        self.geoCollection.add(pmark);
-                    }*/
-                });
-                this.mymap.geoObjects.add(this.geoCollection);
-            },
+            
             makePath: function() {
                 if(this.$store.state.makePath)
                 {
@@ -213,17 +134,30 @@ let self = {};
                     this.$store.commit('DESTROY_PATH_COMPLETE');
                 }      
             }
-        },
+        }
     }
-   
+    
+    function setMark(){
+        if (self._route)
+            self.mymap.geoObjects.remove(self._route);
+        self.geoCollection.removeAll();                                
+        self.geoCollection = null;
+        self.myBalloonContentBodyLayout = customBCBL();
+        self.geoCollection = new ymaps.GeoObjectCollection();
+        self.$store.state.selectedPO.forEach(function(otd) {
+            var pmark = pmarkFab(otd, self.myBalloonContentBodyLayout);
+            self.geoCollection.add(pmark);                        
+        });
+        self.mymap.geoObjects.add(self.geoCollection);     
+    }
+    
     function mapRender() {        
         self.mymap = new window.ymaps.Map("ymap", {
             center: [50.59, 36.58],
             zoom: 10,
             controls: ['routeEditor']
         });
-        self.$store.dispatch('ymaprender');
-        
+        self.$store.dispatch('ymaprender');        
     }  
 
     function customBCBL() {

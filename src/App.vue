@@ -53,7 +53,12 @@
         },
         components: {
           Newevnt          
-        },        
+        },
+        created() {
+            console.log('APP created');
+            this.$store.dispatch('ymapstart');
+            //this.$store.dispatch('loadAllPO');
+        },
         methods: {
             goHome: function() {
                 this.$router.push({

@@ -30,18 +30,21 @@ const state = {
     listsSelectedPO:[],
     selectedlistsAll:[],
     users:[],
-    listNew:{evnts:[],executor:"",title:"",description:""}
+    listNew:{evnts:[],executor:"",title:"",description:"", path:[]},
+    showPathMap:false
 }
+
 
 const actions = {
     //lists
+    
     saveNewList(context){
         context.state.listNew.createdDate=new Date();
         context.state.listNew.created="588530e0bf376a0e34420fa1"; // хак
         context.state.listNew.evnts=context.state.listNew.evnts.map(evnt=>{
             return {evnt:evnt.id,postalCode:evnt.postalCode};
         });
-        console.log(context.state.listNew);
+        //console.log(context.state.listNew);
         axios.post('http://127.0.0.1:3000/lists/new',context.state.listNew)
             .then(response=>{
             console.log('new lists saved $response',response);
@@ -54,25 +57,40 @@ const actions = {
         axios.get('http://127.0.0.1:3000/users/all').then(response=>{
             if(response.status==200){
                 context.commit('USERS_LOADED', response.data);
+                context.dispatch('getListsAll');
             }
         }).catch(err=>{
             console.log('ошибка загрузки users $err',err);
         });
     },
     getListsAll(context,filter){
-        console.log('dispatch getListsAll command');
+        //console.log('dispatch getListsAll command');
         axios.get('http://127.0.0.1:3000/lists/all').then(response=>{
             if(response.status==200){
                 var data=response.data;
                 data.forEach(list=>{
-                   list.listsAllEvnts=list.evnts.length;
                 
-                var set=new Set();
-                    list.evnts.forEach(evnt=>{
-                        set.add(evnt.postalCode);
-                    });                
-                list.listsAllPOs=set.size; 
+                    list.listsAllEvnts=list.evnts.length;
+                
+                    var set=new Set();
+                        list.evnts.forEach(evnt=>{
+                            set.add(evnt.postalCode);
+                        });                
+                    list.listsAllPOs=set.size;
+                    
+                    let path=[];
+                    list.path.forEach(_postalCode=>{
+                        
+                        context.state.postOffice.forEach(po=>{
+                            if(po.postalCode==_postalCode)
+                            {
+                                path.push(po);                                
+                            }                                
+                        });
+                    });
+                    list.path=path;
                 });
+                //console.log(data);
                 context.commit('LISTS_LOADED', data);
             }
         }).catch(err=>{
@@ -115,41 +133,25 @@ const actions = {
         context.commit('YMAP_REMOVE_FILTER');
     },
     ymapstart(context){        
-         window.ymaps.ready(function () {
-             /*axios.get(`http://127.0.0.1:3000/evnt`)
-                 .then(response => {console.log(response.data)})
-                 .catch(e => {console.log(e)});
-              axios.post(`http://127.0.0.1:3000/evnt/save`,{
-                  zzz:"xxx"}
-              )
-                 .then(response => {console.log(response.data)})
-                 .catch(e => {console.log(e)});*/
-             
-            context.commit('YMAPREADY', true);            
+         window.ymaps.ready(function () {            
+            context.commit('YMAPREADY', true);
+            context.dispatch('loadAllPO'); 
         })
     },
     ymaprender(context)
     {
-        context.commit('YMAPRENDER', true);
-        /*var ff=getAllPO();        
-        ff.then(function (data) {
-                context.commit('PO_LOADED',data);                
-            });*/
-            /*fetch('http://127.0.0.1:3000/po/all').then(function (response) {
-                //alert(response.headers.get('Content-Type')); // application/json; charset=utf-8
-                //alert(response.status) // 200
-                return response.json()
-            }).then(function (data) {
-                context.commit('PO_LOADED',data);                
-            });*/
+        context.commit('YMAPRENDER', true);        
+    },
+    loadAllPO(context){
         axios.get('http://127.0.0.1:3000/po/all').then(response=>{
             if(response.status==200){
-                context.commit('PO_LOADED',response.data);
+                context.commit('PO_LOADED',response.data);                
+                context.dispatch('getUsers');
             }
         }).catch(err=>{
             console.log(err);
         });
-        
+
     },
     saveNewEvnt(context,nevnt){        
         let evntarr=[];
@@ -219,8 +221,12 @@ const actions = {
 
 const mutations = {
     ////// lists
+        SHOW_PATH_MAP(state,stt){
+            state.showPathMap=stt;
+        },
         PREPARE_NEW_LISTS(state,evnts){
             state.listNew.evnts=evnts;
+            state.listNew.path=state.selectedPO;
         },
         USERS_LOADED(state,users){            
             state.users=users;
@@ -295,7 +301,7 @@ const mutations = {
             }            
         },
         YMAPREADY(state,status){
-            state.ymapready=status;
+            state.ymapready=status;           
         },
         YMAPRENDER(state,status){
             state.ymaprerender=status;
@@ -357,6 +363,7 @@ const mutations = {
         },
 
         PO_LOADED(state,massive) {
+
             state.postOffice=massive;
             /*if(Object.getOwnPropertyNames(state.ymapFilter).length>1)
             {
