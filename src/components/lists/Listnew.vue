@@ -18,20 +18,7 @@
                     </el-select>
                 </el-form-item>                
             </el-form>
-            <br>
-            <h4>Список заданий/работ</h4>
-            <el-table :data="listNew.evnts" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="listsallevnt">
-              <el-table-column type="selection" width="55">
-                </el-table-column>
-                <el-table-column label="Заголовок" prop="title" sortable>      
-                </el-table-column>
-                <el-table-column label="Статус" sortable prop="status">                  
-                </el-table-column>
-                <el-table-column label="Начало" prop="start"></el-table-column>
-                <el-table-column label="Окончание" prop="end"></el-table-column>
-                <el-table-column label="Описание" prop="description">                   
-                </el-table-column>
-          </el-table>
+          
         </el-tab-pane>
              
     </el-tabs>
@@ -57,16 +44,14 @@
                 return this.$store.state.users;
             }
         },
-        methods:{
-            handleSelectionChange(val) {      	
-                this.multipleSelection = val;        
-            },
-            toggleRowSelect(rows,row){
-                
-            },
+        methods:{            
             onSubmit(){
                 //console.log(this.listNew);
                 this.$store.dispatch('saveNewList');
+                this.$router.push(
+                    {
+                        path:"/"
+                    }); 
             }
         }
     }

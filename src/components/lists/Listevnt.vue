@@ -20,8 +20,14 @@
                 </el-table-column>
                 <el-table-column label="Адрес" prop="addressSource">                  
                 </el-table-column>
+                <el-table-column label="№" >
+                    <template scope="scope">
+                        <input v-model="scope.row.pindx">
+                    </template>
+                </el-table-column>                                 
                                                   
           </el-table>
+          <el-button @click.prevent="onRebuildPath">Перестроить маршрут</el-button>
         </el-tab-pane>     
     </el-tabs>
     </div>
@@ -38,6 +44,9 @@
         props:["listsAll"], 
         watch:{
             
+        },
+        mounted:function(){
+            console.log('mounted');
         },
         computed:{
             /*listsAll:function(){                
@@ -57,6 +66,20 @@
                 }else{
                     this.$store.commit("SHOW_PATH_MAP",false);
                 }
+            },
+            onRebuildPath(){
+                this.listsAll.path.sort(function(a,b){
+        	if (a.pindx > b.pindx) {
+    					return 1;
+  				}
+  				if (a.pindx < b.pindx) {
+    				return -1;
+  				}
+  					return 0;
+                });
+                let tarr=this.listsAll.path;
+                this.listsAll.path=[];
+                this.listsAll.path=tarr;
             }
         }
     }

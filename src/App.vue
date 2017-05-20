@@ -59,6 +59,23 @@
             this.$store.dispatch('ymapstart');
             //this.$store.dispatch('loadAllPO');
         },
+        computed:{
+            dataSaveSuccessNotify(){
+                return this.$store.state.dataSaveSuccessNotify;
+            }
+        },
+        watch:{
+            dataSaveSuccessNotify:function(n){
+                if(n){
+                    const h = this.$createElement;
+                    this.$notify({
+                        title: 'Сохранение данных',
+                        message: h('i', { style: 'color: teal' }, 'Данные сохпраенены успешно')
+                    });
+                }
+                this.$store.commit('DATA_SAVE_NOTIFY',false);
+            }
+        },
         methods: {
             goHome: function() {
                 this.$router.push({

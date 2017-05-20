@@ -31,7 +31,8 @@ const state = {
     selectedlistsAll:[],
     users:[],
     listNew:{evnts:[],executor:"",title:"",description:"", path:[]},
-    showPathMap:false
+    showPathMap:false,
+    dataSaveSuccessNotify:false
 }
 
 
@@ -44,13 +45,18 @@ const actions = {
         context.state.listNew.evnts=context.state.listNew.evnts.map(evnt=>{
             return {evnt:evnt.id,postalCode:evnt.postalCode};
         });
+        context.state.listNew.path=context.state.listNew.path.map(evnt=>{
+            return evnt.postalCode;
+        });
         //console.log(context.state.listNew);
         axios.post('http://127.0.0.1:3000/lists/new',context.state.listNew)
             .then(response=>{
             console.log('new lists saved $response',response);
             context.state.listNew={evnts:[],executor:"",title:"",description:""};
+            context.commit('DATA_SAVE_NOTIFY',true);
+            context.dispatch('getListsAll');
         }).catch(err=>{
-            console.log('ошибка записи списка $err', $err);
+            console.log('ошибка записи списка $err', err);
         });
     },
     getUsers(context){
@@ -221,11 +227,19 @@ const actions = {
 
 const mutations = {
     ////// lists
+        DATA_SAVE_NOTIFY(state,st){
+            state.dataSaveSuccessNotify=st;
+        },        
         SHOW_PATH_MAP(state,stt){
             state.showPathMap=stt;
         },
         PREPARE_NEW_LISTS(state,evnts){
-            state.listNew.evnts=evnts;
+            state.listNew.evnts=state.selectedPO.reduce(function(a,b){
+                return a.concat(b.evnts);
+            },[]);
+            state.selectedPO.forEach((po,_pindx)=>{
+                po.pindx=_pindx;
+            });
             state.listNew.path=state.selectedPO;
         },
         USERS_LOADED(state,users){            
@@ -236,6 +250,19 @@ const mutations = {
         },
         LISTSALL_SELECTED(state,slist){
             state.selectedlistsAll=slist;
+        },
+        DELETE_EVNT_FROM_LIST(state,evnt){
+            state.selectedPO.forEach(po=>{
+                if(evnt.postalCode==po.postalCode){
+                    var indx=0;                    
+                    po.evnts.forEach((_evnt,_indx)=>{                        
+                        if(_evnt.id==evnt.id){
+                            indx=_indx;
+                        }
+                    })                    
+                    po.evnts.splice(indx,1);
+                }                
+            })           
         },
     //////
         SHOW_NEW_EVNT_DIALOG(state,st){
@@ -399,7 +426,7 @@ const mutations = {
                 });                
             }
             
-            state.selectedPO=arr;
+            state.selectedPO=arr;                        
         },
         TOGGLEFIX_OP(state,op){
             op.fixed=op.fixed?false:true;
@@ -439,6 +466,9 @@ function prepData4ListView(po) {
         postalCode: po.postalCode,
         latitude: po.latitude,
         longitude: po.longitude,
+        addressSource:po.addressSource,
+        region:po.region,
+        settlement:po.settlement,
         evnts: po.evnts.map(function (o) {
             let chld = {
                 id: o._id,
@@ -449,12 +479,14 @@ function prepData4ListView(po) {
                 postalCode: o.postalCode,
                 status: o.status,
                 description: o.description,
-                executor: o.executor
+                executor: o.executor,
+                show:true
             }
             return chld;
         }),
         evntsLength:po.evnts.length,
-        fixed:false
+        fixed:false,
+        pindx:0
     };
     
     return listel;

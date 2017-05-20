@@ -48,12 +48,12 @@
         </el-tab-pane>
         <el-tab-pane label="Заявки / работы" name="second">
             <el-select v-model="evntTypeFilter" multiple placeholder="Выберите тип" @change="onChangeEvntTypeFilter">
-                <el-option v-for="type in evnttype" :key="type" :label="type" :value="type">                    
+                <el-option v-for="type in selectedEvntsType" :key="type" :label="type" :value="type">                    
                 </el-option>                 
               </el-select>
               <ul id="">
-                     <li v-for="evnt in evnts">
-                     {{evnt.label}} - 
+                     <li v-for="evnt in selEvnts" v-if="evnt.show">
+                     {{evnt.label}} {{evnt.postalCode}} 
                      <a href="#" @click.prevent="onShowEvntDetail(evnt)">Детали</a>
                      <a href="#" @click.prevent="onDeleteEvntFromEvntsList(evnt)">Удалить</a>
                       </li>
@@ -90,7 +90,10 @@
         multipleSelection: [],
         evntTypeFilter:[], //сюда собирается выбор селекта
         evnttype:[],  //текст для селекта
-        evnts:[] // all evnts  
+        evnts:[], // all evnts  
+          
+          
+        selEvnts:[]  
       }
     },
     mounted() {
@@ -112,33 +115,26 @@
     computed:{
         selectedPO:function(){            
             return this.$store.state.selectedPO;
+        },
+        selectedEvnts:function(){            
+            return this.$store.state.selectedPO.reduce(function(a,b){
+                return a.concat(b.evnts);
+            },[]);
+            //a1.map(function(obj){return obj.arr}).reduce(function(a,b){ return a.concat(b)})            
+        },
+        selectedEvntsType:function(){            
+            let typeset=new Set(this.selectedEvnts.map(evnt=>{
+                return evnt.title}));
+            return [...typeset];
         }
     },
     watch:{
         selectedPO(){
-            let typeset=new Set();
-            let to={};
-            this.evnts.forEach(evnt=>{
-                if(to.hasOwnProperty(evnt.postalCode)){
-                    to[evnt.postalCode].push(evnt);
-                }else{
-                    to[evnt.postalCode]=[evnt];
-                }
-            });
-            this.evnts=[];
-            this.selectedPO.forEach(po=>{
-               if(to.hasOwnProperty(po.postalCode)){
-                   this.evnts=this.evnts.concat(to[po.postalCode]);
-               }else{
-                 po.evnts.forEach(evnt=>{
-                    this.evnts.push(evnt);
-                });  
-               }                 
-            });
-            this.evnts.forEach(evnt=>{
-                typeset.add(evnt.title); 
-            });
-            this.evnttype=[...typeset];
+            /*this.selEvnts=[];
+            this.selEvnts=this.selectedEvnts;*/
+        },
+        selectedEvnts:function(n){
+           
         }
     },    
     methods: {
@@ -146,28 +142,33 @@
         this.$store.commit('SHOW_EVNT_DETAIL',evnt);
     },
     onDeleteEvntFromEvntsList(evnt){
-        let indx=this.evnts.indexOf(evnt);
-        this.evnts.splice(indx,1);
+        this.$store.commit('DELETE_EVNT_FROM_LIST', evnt);
+        this.selEvnts=[];
+        this.selEvnts=this.selectedEvnts;        
+        
     },
     onChangeEvntTypeFilter(val){
-        this.evnts=[];
-        this.selectedPO.forEach(po=>{
-            po.evnts.forEach(evnt=>{
-                if(val.length==0){
-                    this.evnts.push(evnt);
-                }else if(val.length>0){
-                    if(val.indexOf(evnt.title)!=-1){
-                        this.evnts.push(evnt);
-                    }
-                }                              
-            })
-        });
+        if(val.length==0){
+          this.selectedEvnts.forEach(evnt=>{
+            evnt.show=true;            
+          })  
+        }else{
+            this.selectedEvnts.forEach(evnt=>{
+            evnt.show=false;
+            if(val.indexOf(evnt.title)!=-1){                
+                evnt.show=true;                
+            }
+        })
+        }
+        
+        this.selEvnts=[];
+        this.selEvnts=this.selectedEvnts;       
     },    
     handleTabClick(tab){
         //tab.name
         if(tab.name=='second'){
-            
-            
+            this.selEvnts=[];
+            this.selEvnts=this.selectedEvnts;            
         }//tab second end
     },    
     removeUnselected(){
@@ -175,11 +176,7 @@
     },    
     fixValues(){
         
-        this.$store.commit('FIX_SELECTED_VALUES_OP',this.multipleSelection);
-        // not vuex )))
-        /*this.multipleSelection.forEach(function(otd){
-            otd.fixed=true;
-        });*/
+        this.$store.commit('FIX_SELECTED_VALUES_OP',this.multipleSelection);       
     },
     unfixValues(){
         this.$store.commit('UNFIX_SELECTED_VALUES_OP');

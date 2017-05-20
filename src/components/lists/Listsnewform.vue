@@ -1,33 +1,38 @@
 <template>
+ <div>
   <el-row :gutter="10">
     <h1>{{ msg }}</h1>
     <div class="m-panel">
         <el-button @click="toggleListAll">Скрыть/показать все списки</el-button>
-    </div>    
-     <transition name="fade">
-      <el-col :span="8" v-show="hideBlock">
-          <listsall></listsall>
-      </el-col>
-    </transition>
-     <transition name="fade" v-on:after-leave="afterLeave"  v-on:before-enter="beforeEnter">
-      <el-col :span="8" v-show="hideBlock">
-          <listevnt v-bind:listsAll="listsAll"></listevnt>
-      </el-col>
-    </transition>
-
-      <el-col :span="8" :class="{ slideInRight: slide}">
-          <listnew></listnew>
-      </el-col>
-      <el-col :span="8" v-if="!hideBlock">
-          <apath v-bind:path="listNew.path"></apath>
-      </el-col>
-      <transition name="fade" v-on:after-leave="afterLeave"  v-on:before-enter="beforeEnter">
-      <el-col :span="8" v-show="!hideBlock">
+    </div>
+    </el-row>    
+    
+<el-row :gutter="10" class="r-row">    
+     <transition name="fade" mode="out-in">
+         <el-col :span="16" v-show="hideBlock" >
+             <el-col :span="12">
+                  <listsall></listsall>
+              </el-col>
+              <el-col :span="12">
+                  <listevnt v-bind:listsAll="listsAll"></listevnt>
+              </el-col>
+         </el-col>      
+        </transition>
+        <transition name="fade" mode="out-in">
+         <el-col :span="16" v-show="!hideBlock" >
+             <el-col :span="8">
+                  <listnew></listnew>
+              </el-col>
+              <el-col :span="16">
+                  <apath v-bind:path="listNew.path"></apath>
+              </el-col>
+         </el-col>      
+        </transition>    
+      <el-col :span="8" key="ln" class="m-abslt">
           <listevnt v-bind:listsAll="listNew"></listevnt>
-      </el-col>
-    </transition>
-
-    </el-row>
+      </el-col>    
+    </el-row>  
+      </div>
 </template>
 
 <script>
@@ -36,7 +41,11 @@
     import Listnew from 'src/components/lists/Listnew.vue'
     import Apath from 'src/components/lists/Apath.vue'
     //import Mmap from 'src/components/Mmap.vue'
-
+    
+    //:class="{ slideInRight: slide}"
+    //v-on:after-leave="afterLeave"  v-on:before-enter="beforeEnter"
+    
+    
     export default {
         name: 'at1',
         components: {
@@ -64,6 +73,7 @@
             }            
         },
         computed:{
+            
             listsAll:function(){                
                 return this.$store.state.selectedlistsAll;
             },
@@ -103,9 +113,23 @@
         padding-left: 15px;
         padding-right: 15px;
     }
+    
+    .r-row{
+        position:relative;
+    }
+    .m-abslt{
+        position:absolute;
+        top:0;
+        right: 0;
+    }
+    
     .hideblock{
         display: none;
     }
+    .fade-transition {
+  opacity: 1;
+  transition: all .5s linear;
+}
     .fade-enter-active, .fade-leave-active {
         transition: opacity .5s
     }
