@@ -28,17 +28,72 @@ const state = {
     //lists
     listsAll:[],
     listsSelectedPO:[],
-    selectedlistsAll:[],
-    users:[],
+    selectedlistsAll:[],    
     listNew:{evnts:[],executor:"",title:"",description:"", path:[]},
     showPathMap:false,
-    dataSaveSuccessNotify:false
+    //users
+    users:[],
+    showNewUser:false,
+    currUser:{
+        _id:"",
+        email: "",
+        pass: "",
+        role: "",
+        login: "",
+        fio: ""
+    },
+    showUserDialog:false,
+    //notify
+    successNotifyTxt:""
 }
 
 
 const actions = {
-    //lists
-    
+    //users
+    getUsers(context){
+        axios.get('http://127.0.0.1:3000/users/all').then(response=>{
+            if(response.status==200){
+                context.commit('USERS_LOADED', response.data);
+                context.dispatch('getListsAll');
+            }
+        }).catch(err=>{
+            console.log('ошибка загрузки users $err',err);
+        });
+    },
+    saveNewUser(context,user){
+        context.commit('SHOW_NEW_USER_DIALOG',false);
+        axios.post('http://127.0.0.1:3000/users/new',user)
+            .then(response=>{
+            console.log('new user saved $response',response);            
+            context.commit('SUCCESS_NOTIFY','Новый пользователь создан');
+            context.dispatch('getUsers');
+        }).catch(err=>{
+            console.log('ошибка записи списка $err', err);
+        });
+    },
+    updateUser(context,user){
+        context.commit('SHOW_USER_DIALOG',false);
+        axios.post('http://127.0.0.1:3000/users/update',user)
+            .then(response=>{
+            console.log('new user saved $response',response);            
+            context.commit('SUCCESS_NOTIFY','Данные пользователя изменены');
+            context.dispatch('getUsers');
+        }).catch(err=>{
+            console.log('ошибка записи списка $err', err);
+        });
+    },
+    deleteUser(context,user){
+        context.commit('SHOW_USER_DIALOG',false);
+        axios.post('http://127.0.0.1:3000/users/del',user)
+            .then(response=>{
+            console.log('new user saved $response',response);            
+            context.commit('SUCCESS_NOTIFY','Пользователь удален');
+            context.dispatch('getUsers');
+        }).catch(err=>{
+            console.log('ошибка записи списка $err', err);
+        });
+    },
+    //lists    
     saveNewList(context){
         context.state.listNew.createdDate=new Date();
         context.state.listNew.created="588530e0bf376a0e34420fa1"; // хак
@@ -53,22 +108,13 @@ const actions = {
             .then(response=>{
             console.log('new lists saved $response',response);
             context.state.listNew={evnts:[],executor:"",title:"",description:""};
-            context.commit('DATA_SAVE_NOTIFY',true);
+            context.commit('SUCCESS_NOTIFY',true);
             context.dispatch('getListsAll');
         }).catch(err=>{
             console.log('ошибка записи списка $err', err);
         });
     },
-    getUsers(context){
-        axios.get('http://127.0.0.1:3000/users/all').then(response=>{
-            if(response.status==200){
-                context.commit('USERS_LOADED', response.data);
-                context.dispatch('getListsAll');
-            }
-        }).catch(err=>{
-            console.log('ошибка загрузки users $err',err);
-        });
-    },
+    
     getListsAll(context,filter){
         //console.log('dispatch getListsAll command');
         axios.get('http://127.0.0.1:3000/lists/all').then(response=>{
@@ -226,9 +272,20 @@ const actions = {
 }
 
 const mutations = {
+    //////users
+    SET_CURR_USER(state,user){
+        state.currUser=user;
+    },
+    SHOW_NEW_USER_DIALOG(state,st){
+        state.showNewUser=st;
+    },
+    SHOW_USER_DIALOG(strate,st){
+        state.showUserDialog=st;
+    },
+    /////
     ////// lists
-        DATA_SAVE_NOTIFY(state,st){
-            state.dataSaveSuccessNotify=st;
+        SUCCESS_NOTIFY(state,txt){
+            state.successNotifyTxt=txt;
         },        
         SHOW_PATH_MAP(state,stt){
             state.showPathMap=stt;

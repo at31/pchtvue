@@ -3,7 +3,7 @@
     <h1>{{ msg }}</h1>
      <el-col :span="24">
          <el-button-group>
-             <el-button @click="">
+             <el-button @click="onEditList">
                  <icon name="edit"></icon>
                  <span>Редактировать список</span>
              </el-button>
@@ -35,16 +35,18 @@
       <el-col :span="8" v-if="showPathMap">
           <apath v-bind:path="listsAll.path"></apath>
       </el-col>
-    </transition>
-      
-
-    </el-row>
+    </transition>      
+    
+    <listsdialog v-bind:editMode="editMode" v-bind:show="show"></listsdialog>
+    
+    </el-row>        
 </template>
 
 <script>
     import Listsall from 'src/components/lists/Listsall.vue'
     import Listevnt from 'src/components/lists/Listevnt.vue'
     import Apath from 'src/components/lists/Apath.vue'
+    import Listsdialog from 'src/components/lists/Listsdialog.vue'
 
     export default {
         name: 'alllists',
@@ -52,13 +54,16 @@
           //  Mmap,
             Listevnt,
             Listsall,
-            Apath
+            Apath,
+            Listsdialog
         },
         data() {
             return {
                 //msg: 'lists'
                 hideBlock:false,
-                slide:false
+                slide:false,
+                editMode:true,
+                show:false
             }
         },
         props:['msg'],
@@ -82,7 +87,9 @@
             }
         },
         methods:{
-            
+            onEditList(){
+                this.show=true;
+            }
         }
     }
 

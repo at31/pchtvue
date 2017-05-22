@@ -5,7 +5,7 @@ import Newevnt from 'src/components/evnts/Newevnt'
 import AllLists from 'src/components/lists/AllLists'
 import Listsnewform from 'src/components/lists/Listsnewform'
 import Listsnewmap from 'src/components/lists/Listsnewmap'
-//import Listnewmap from 'src/components/lists/Listnewmap'
+import UsersAll from 'src/components/users/UsersAll'
 //import Listnewform from "./src/components/lists/Listnewform"
 //import AllLists from "./src/components/lists/AllLists"
 
@@ -37,6 +37,12 @@ export default new Router({
         name:"AllLists",
         component:AllLists,
         props:{msg:"AT31"}
-    }
+    },
+    {
+        path:"/users",
+        name:"UsersAll",
+        component:UsersAll,
+        props:{msg:"AT31"}
+    } 
   ]
 })

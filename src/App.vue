@@ -24,6 +24,7 @@
 
 <el-submenu index="7">
     <template slot="title">Пользователи</template>
+<el-menu-item @click="allUsers" index="7-3">Все пользователи</el-menu-item>    
 <el-menu-item @click="newUsers" index="7-1">Новый пользователь</el-menu-item>
 <el-menu-item @click="editdelUsers" index="7-2">Редактирование / удаление</el-menu-item>
 </el-submenu>
@@ -61,7 +62,7 @@
         },
         computed:{
             dataSaveSuccessNotify(){
-                return this.$store.state.dataSaveSuccessNotify;
+                return this.$store.state.successNotifyTxt;
             }
         },
         watch:{
@@ -73,7 +74,6 @@
                         message: h('i', { style: 'color: teal' }, 'Данные сохпраенены успешно')
                     });
                 }
-                this.$store.commit('DATA_SAVE_NOTIFY',false);
             }
         },
         methods: {
@@ -114,7 +114,13 @@
             
             newUsers:function(){},
             editdelUsers:function(){},
-            
+            allUsers:function(){
+                this.$router.push({
+                    path: "/users",
+                    params: {
+                    }
+                });
+            },
             
             handleSelect: (val) => {
                 //console.log(val);
