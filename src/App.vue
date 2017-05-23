@@ -125,8 +125,6 @@
             handleSelect: (val) => {
                 //console.log(val);
             },
-            
-
         },
 
 
