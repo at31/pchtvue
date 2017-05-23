@@ -24,7 +24,7 @@
                   <listnew></listnew>
               </el-col>
               <el-col :span="16">
-                  <apath v-bind:path="listNew.path"></apath>
+                  <apath v-bind:selectedList="listNew"></apath>
               </el-col>
          </el-col>      
         </transition>    
@@ -83,7 +83,7 @@
             showPathMap:function(){
                 return this.$store.state.showPathMap;
             },
-            listNew:function(){                
+            listNew:function(){
                 return this.$store.state.listNew;
             }
         },

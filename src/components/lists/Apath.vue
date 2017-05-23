@@ -13,11 +13,11 @@
         data() {
             return {
                 geoCollection: { removeAll:function(){return true;}},
-                         
+                path:[]         
             }
 
         },
-        props:["path"],
+        props:["selectedList"],
         mounted() {
             console.log('apath mounted');
             self = this;
@@ -76,12 +76,23 @@
         computed: {                        
             mapready() {            
                 return this.$store.state.ymapready
-            },                                    
+            }
         },
         watch: {
-            path:function(){
+            selectedList:function(n){
+                console.log('apath new list form', n)
+                if(n!=null){
+                    if(n.path.length>1){
+                this.path=this.selectedList.path;
                 this.makePath();
+                    }             
+                }else{
+                    this.path=[];
+                    this.destroyPath();
+                }
+                
             }
+            
         },
     }
    
@@ -91,7 +102,12 @@
             zoom: 10,
             controls: ['routeEditor']
         });
-        self.makePath();
+        if(self.selectedList!=null){
+            if(self.selectedList.path.length>1){
+                self.path=self.selectedList.path;
+                self.makePath();   
+            }            
+        }            
         //self.$store.dispatch('ymaprender');
         
     }  

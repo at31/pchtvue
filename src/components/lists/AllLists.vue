@@ -7,7 +7,7 @@
                  <icon name="edit"></icon>
                  <span>Редактировать список</span>
              </el-button>
-             <el-button @click="">
+             <el-button @click="onDeleteList">
                  <icon name="trash"></icon>
                  <span>Удалить список</span>
              </el-button>
@@ -33,11 +33,11 @@
     </transition>
      <transition name="fade" >
       <el-col :span="8" v-if="showPathMap">
-          <apath v-bind:path="listsAll.path"></apath>
+          <apath v-bind:selectedList="listsAll"></apath>
       </el-col>
     </transition>      
     
-    <listsdialog v-bind:editMode="editMode" v-bind:show="show"></listsdialog>
+    <listsdialog v-bind:editMode="editMode" ></listsdialog>
     
     </el-row>        
 </template>
@@ -88,7 +88,12 @@
         },
         methods:{
             onEditList(){
-                this.show=true;
+                this.editMode=true;
+                this.$store.commit('SHOW_LIST_DIALOG',true);
+            },
+            onDeleteList(){
+                this.editMode=false;
+                this.$store.commit('SHOW_LIST_DIALOG',true);
             }
         }
     }

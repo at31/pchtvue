@@ -68,7 +68,7 @@
             }
         },
         methods:{
-            handleSelectionChange(currentRow, oldCurrentRow) {
+            handleSelectionChange(currentRow, oldCurrentRow) {                
                 this.currentRow = currentRow;
                 this.$store.commit('LISTSALL_SELECTED',currentRow);
             },

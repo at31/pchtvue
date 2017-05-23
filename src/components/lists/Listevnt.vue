@@ -2,7 +2,7 @@
     <div class="m-panel">
         <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="Задания из списка" name="first">
-            <el-table :data="listsAll.evnts" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="listsallevnt">
+            <el-table :data="eList.evnts" border style="width: 100%" height="700" :default-sort = "{order: 'descending'}"  @selection-change="handleSelectionChange" @select="toggleRowSelect" ref="listsallevnt">
               <el-table-column type="selection" width="55">
                 </el-table-column>
                 <el-table-column label="Заголовок" prop="title" sortable>      
@@ -16,7 +16,7 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="Маршрут" name="second">
-                <el-table :data="listsAll.path" border style="width: 100%" height="700"  ref="listspath">   <el-table-column label="Индекс" prop="postalCode" >      
+                <el-table :data="eList.path" border style="width: 100%" height="700"  ref="listspath">   <el-table-column label="Индекс" prop="postalCode" >      
                 </el-table-column>
                 <el-table-column label="Адрес" prop="addressSource">                  
                 </el-table-column>
@@ -38,15 +38,27 @@
         name: 'listsallevnt',
         data () {        
             return {                
-                activeName:'first'
+                activeName:'first',
+                eList:{evnts:[],path:[]}
             }
         },
         props:["listsAll"], 
         watch:{
-            
+            listsAll:function(n){
+                console.log('listevnt listsall watcher',n);
+                if(n!=null){
+                    this.eList=n;
+                }else{
+                    this.eList={evnts:[],path:[]};
+                }
+            }
         },
         mounted:function(){
-            console.log('mounted');
+            if(this.listsAll!=null){
+                    this.eList=this.listsAll;
+                }else{
+                    this.eList={evnts:[],path:[]};
+                }
         },
         computed:{
             /*listsAll:function(){                
@@ -68,7 +80,7 @@
                 }
             },
             onRebuildPath(){
-                this.listsAll.path.sort(function(a,b){
+                this.eList.path.sort(function(a,b){
         	if (a.pindx > b.pindx) {
     					return 1;
   				}
@@ -77,9 +89,9 @@
   				}
   					return 0;
                 });
-                let tarr=this.listsAll.path;
-                this.listsAll.path=[];
-                this.listsAll.path=tarr;
+                let tarr=this.eList.path;
+                this.eList.path=[];
+                this.eList.path=tarr;
             }
         }
     }

@@ -28,9 +28,17 @@ const state = {
     //lists
     listsAll:[],
     listsSelectedPO:[],
-    selectedlistsAll:[],    
+    selectedlistsAll:{
+        _id:"",
+        title:"",
+        description:"",
+        executor:{fio:""},
+        path:[],
+        evnts:[]
+    },    
     listNew:{evnts:[],executor:"",title:"",description:"", path:[]},
     showPathMap:false,
+    showListDialog:false,
     //users
     users:[],
     showNewUser:false,
@@ -75,7 +83,7 @@ const actions = {
         context.commit('SHOW_USER_DIALOG',false);
         axios.post('http://127.0.0.1:3000/users/update',user)
             .then(response=>{
-            console.log('new user saved $response',response);            
+            console.log('user updated $response',response);            
             context.commit('SUCCESS_NOTIFY','Данные пользователя изменены');
             context.dispatch('getUsers');
         }).catch(err=>{
@@ -86,14 +94,40 @@ const actions = {
         context.commit('SHOW_USER_DIALOG',false);
         axios.post('http://127.0.0.1:3000/users/del',user)
             .then(response=>{
-            console.log('new user saved $response',response);            
+            console.log('user deleted $response',response);            
             context.commit('SUCCESS_NOTIFY','Пользователь удален');
             context.dispatch('getUsers');
         }).catch(err=>{
             console.log('ошибка записи списка $err', err);
         });
     },
-    //lists    
+    //lists 
+    updateList(context,list){
+        context.commit('SHOW_LIST_DIALOG',false);
+        axios.post('http://127.0.0.1:3000/lists/update',list)
+            .then(response=>{
+            console.log('list updated $response',response);            
+            context.commit('SUCCESS_NOTIFY','Данные списка изменены');
+            context.dispatch('getUsers');
+           
+        }).catch(err=>{
+            console.log('ошибка записи списка $err', err);
+        });
+    },
+    deleteList(context,list){
+        console.log(list);
+        context.commit('SHOW_LIST_DIALOG',false);
+        axios.post('http://127.0.0.1:3000/lists/del',list)
+            .then(response=>{
+            console.log('list deleted $response',response);            
+            context.commit('SUCCESS_NOTIFY','Список удален');            
+            context.dispatch('getUsers');
+           //
+            
+        }).catch(err=>{
+            console.log('ошибка записи списка $err', err);
+        });
+    },
     saveNewList(context){
         context.state.listNew.createdDate=new Date();
         context.state.listNew.created="588530e0bf376a0e34420fa1"; // хак
@@ -284,16 +318,19 @@ const mutations = {
     },
     /////
     ////// lists
+        SHOW_LIST_DIALOG(state,st){
+            state.showListDialog=st;
+        },
         SUCCESS_NOTIFY(state,txt){
             state.successNotifyTxt=txt;
         },        
         SHOW_PATH_MAP(state,stt){
             state.showPathMap=stt;
         },
-        PREPARE_NEW_LISTS(state,evnts){
+        PREPARE_NEW_LISTS(state,evnts){            
             state.listNew.evnts=state.selectedPO.reduce(function(a,b){
                 return a.concat(b.evnts);
-            },[]);
+            },[]);            
             state.selectedPO.forEach((po,_pindx)=>{
                 po.pindx=_pindx;
             });
@@ -302,11 +339,14 @@ const mutations = {
         USERS_LOADED(state,users){            
             state.users=users;
         },
-        LISTS_LOADED(state,lists){            
+        LISTS_LOADED(state,lists){
+            
             state.listsAll=lists;
         },
         LISTSALL_SELECTED(state,slist){
-            state.selectedlistsAll=slist;
+            
+                state.selectedlistsAll=slist;
+            
         },
         DELETE_EVNT_FROM_LIST(state,evnt){
             state.selectedPO.forEach(po=>{

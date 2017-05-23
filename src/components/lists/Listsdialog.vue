@@ -1,15 +1,15 @@
 <template>
 <!-- new user modal-->
 <el-dialog title="Редактирование списка" :visible.sync="show" size="tiny" @close="onClose">
-         <el-form :model="currList" :rules="rules" ref="currList" label-width="120px" class="user-ruleForm">
+         <el-form :model="cList" :rules="rules" ref="cList" label-width="120px" class="user-ruleForm">
               <el-form-item label="Заголовок" prop="title">
-                <el-input v-model="currList.title"></el-input>
+                <el-input v-model="cList.title"></el-input>
               </el-form-item>
               <el-form-item label="Описание" prop="description">
-                <el-input v-model="currList.description" ></el-input>
+                <el-input v-model="cList.description" ></el-input>
               </el-form-item>
               <el-form-item label="Исполнитель">
-                    <el-select v-model="currList.executor.fio" placeholder="Выберите исполнителя">
+                    <el-select v-model="fio" placeholder="Выберите исполнителя" @change="onUserSelect">
                         <el-option v-for="user in users" :key="user._id" :label="user.fio" :value="user._id"></el-option>                 
                     </el-select>
                 </el-form-item> 
@@ -30,82 +30,84 @@
     export default {
         name: 'listdialog',
         data() {
-            var validatePass = (rule, val, callback) => {
+            var validateTitle = (rule, val, callback) => {
                 if (val === ''){
-                    callback(new Error('Введите пароль'));
+                    callback(new Error('Введите название'));
             } else {
                 //дополнительные условия и проверки при удачном прохождении callback() else callback(new Error('какая-то ошибка'));
                 callback();
             }
             };
             return {
-                //show: false,
-                /*currList: {
+                show: false,
+                cList: {
                     _id:"",
                     title:"",
                     description:"",
                     executor:{fio:""}
-                },*/
-                currUser:{_id:"",
-                          fio:""},
+                },
+                fio:"",
                 rules: {
-                    pass: [{
-                        validator: validatePass,
+                    title: [{
+                        validator: validateTitle,
                         trigger: 'blur'
                     }]
                 }
             }
         },
-        props:["editMode","show"], 
+        props:["editMode"], 
         mounted() {
-            //console.log(this.showNewEvnt);
+            //console.log('mounted list dialog',this.currList);
         },
         computed: {
             showListEditDialog: function() {
-                return this.$store.state.showListEditDialog
-            },
-            currList:function(){                
-                return this.$store.state.selectedlistsAll;
+                return this.$store.state.showListDialog
             },
             users:function(){
                 return this.$store.state.users;
+            },
+            currList:function(){
+                return this.$store.state.selectedlistsAll;
             }
         },
         watch: {
-            showListEditDialog(_show) {
-                /*-if (_show) {
-                    this.show = true;
-                }*/
+            currList:function(n){
+                if(n!==null){
+                    var jstr=JSON.stringify(n)
+                    this.cList=JSON.parse(jstr);
+                    console.log(n);
+                    this.fio=this.cList.executor.fio;
+                }
+            },
+            showListEditDialog(_show) {                
                 this.show=_show;
             },
-            user:function(n){
-                console.log('whatcher user', n);
-                this.currList= {
-                            _id:n._id,
-                            
-                        };
-            }
+            
         },
         methods: {
-            onClose() {
-                this.show=false;
+            onUserSelect(val){
+                this.cList.executor=val;
+            },
+            onClose() {            
+                this.$store.commit('SHOW_LIST_DIALOG',false);
             },
             updateList: function() {
-                this.$refs.currList.validate(valid => {
-                    if (valid) {                        
-                        this.$store.dispatch('updateList', this.currList);
+                this.$refs.cList.validate(valid => {
+                    if (valid) {
+                                
+                        this.$store.dispatch('updateList', this.cList);
                         
                     } else {
-                        console.log('ошибка валидации формы "редактирование удаление спискоа"');
+                        console.log('ошибка валидации формы "редактирование удаление списка"');
                         return false;
                     }
                 })
             },
-            deleteList(){
-                this.$store.dispatch('deleteList', this.currList);
+            deleteList(){                
+                this.$store.dispatch('deleteList', this.cList);
             },
             resetForm(formName) {
-                this.$refs.currUser.resetFields();
+               // this.$refs.currUser.resetFields();
                 this.currList= {                            
                             
                         };                        

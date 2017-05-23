@@ -193,7 +193,7 @@
             {
                 path:"/list-new-form"
             });  
-        
+        console.log("evnts",JSON.stringify(this.evnts));
         this.$store.commit('PREPARE_NEW_LISTS',this.evnts);
     },        
     handleSelectionChange(val) {
